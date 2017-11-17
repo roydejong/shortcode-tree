@@ -1,0 +1,18 @@
+{
+  "name": "shortcode-tree",
+  "version": "1.0.0",
+  "description": "Parser library for reading short codes (BB codes) into a tree structure",
+  "main": "src/",
+  "scripts": {
+    "test": "mocha --reporter spec || exit 0"
+  },
+  "author": "Roy de Jong <roy@softwarepunt.nl>",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1"
+  },
+  "dependencies": {
+    "meta-shortcodes": "^1.0.3"
+  }
+}
