@@ -36,6 +36,7 @@ let ShortcodeParser = {
         let readingName = true;
         let readingPropName = false;
         let readingPropVal = false;
+        let readingPropValLiteral = false;
 
         let properties = {};
 
@@ -67,12 +68,36 @@ let ShortcodeParser = {
 
                         readingPropName = false;
                         readingPropVal = true;
+                        readingPropValLiteral = false;
                     }
 
                     continue;
                 }
             } else if (readingPropVal) {
-                if (nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR) {
+                let literalClosed = false;
+
+                if (nextToken === ShortcodeParser.T_TAG_PROPERTY_VALUE_WRAPPER) {
+                    // T_TAG_PROPERTY_VALUE_WRAPPER is a character that wraps around a property value to denote a string
+                    // literal, which enables the use of spaces etc within the value.
+                    if (buffer.length === 0) {
+                        // Buffer empty, we must be opening the literal
+                        if (readingPropValLiteral) {
+                            literalClosed = true;
+                        } else {
+                            readingPropValLiteral = true;
+                            continue;
+                        }
+                    } else {
+                        // Buffer not empty, we must be closing the literal
+                        if (!readingPropValLiteral) {
+                            throw new Error('Unexpected T_TAG_PROPERTY_VALUE_WRAPPER (expected a prior start marker)');
+                        } else {
+                            literalClosed = true;
+                        }
+                    }
+                }
+
+                if (nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR || literalClosed) {
                     // The tag or value ends here, or the next property begins
                     if (buffer.length) {
                         properties[currentPropKey] = buffer;
@@ -82,6 +107,7 @@ let ShortcodeParser = {
 
                         readingPropName = true;
                         readingPropVal = false;
+                        readingPropValLiteral = false;
                     }
 
                     continue;
