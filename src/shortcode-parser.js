@@ -83,6 +83,7 @@ let ShortcodeParser = {
                         // Buffer empty, we must be opening the literal
                         if (readingPropValLiteral) {
                             literalClosed = true;
+                            readingPropValLiteral = false;
                         } else {
                             readingPropValLiteral = true;
                             continue;
@@ -93,13 +94,14 @@ let ShortcodeParser = {
                             throw new Error('Unexpected T_TAG_PROPERTY_VALUE_WRAPPER (expected a prior start marker)');
                         } else {
                             literalClosed = true;
+                            readingPropValLiteral = false;
                         }
                     }
                 }
 
-                if (nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR || literalClosed) {
+                if (!readingPropValLiteral && (literalClosed || nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR)) {
                     // The tag or value ends here, or the next property begins
-                    if (buffer.length) {
+                    if (buffer.length || literalClosed) {
                         properties[currentPropKey] = buffer;
                         currentPropKey = null;
 
