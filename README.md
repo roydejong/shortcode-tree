@@ -1,9 +1,13 @@
-# Shortcode parser library
+# shortcode-tree
+A node.js parser library for reading shortcodes.
+
+[![npm](https://img.shields.io/npm/v/github.svg)](https://www.npmjs.com/package/shortcode-tree)
+[![Build Status](https://travis-ci.org/roydejong/shortcode-tree.svg?branch=master)](https://travis-ci.org/roydejong/shortcode-tree)
 
 ## Introduction
-**shortcode-tree** provides generic parsing functionality for text containing short codes (also known as bb codes).
+`shortcode-tree` offers generic parsing functionality for text containing short codes (also known as bb codes).
 
-This library does not convert short codes to HTML (like many others do), but **it converts generic shortcode/HTML input to pure JavaScript objects**.
+This library does not convert short codes to HTML (like many other libraries do), but **it converts generic shortcode/HTML input to pure JavaScript objects**.
 
 No set up is required, and you do not need to pre-define a list of shortcodes.
 
