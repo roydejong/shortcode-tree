@@ -37,6 +37,7 @@ let ShortcodeParser = {
         let readingPropName = false;
         let readingPropVal = false;
         let readingPropValLiteral = false;
+        let escapingInLiteral = false;
 
         let properties = {};
 
@@ -46,78 +47,86 @@ let ShortcodeParser = {
             let nextToken = openBlockText[index];
             let nothingLeft = (typeof nextToken === "undefined");
 
-            if (readingName) {
-                if (nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR) {
-                    // We are finished reading the tag name, next is a property name or end of tag
-                    shortcode.name = buffer;
-
-                    buffer = "";
-
-                    readingName = false;
-                    readingPropName = true;
-                    continue;
-                }
-            } else if (readingPropName) {
-                if (nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR || nextToken === ShortcodeParser.T_TAG_PROPERTY_ASSIGN) {
-                    // The tag or prop ends here (prop with no value), or a separator token was found to start the value
-                    if (buffer.length) {
-                        currentPropKey = buffer;
-                        properties[currentPropKey] = null;
+            if (!escapingInLiteral) {
+                if (readingName) {
+                    if (nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR) {
+                        // We are finished reading the tag name, next is a property name or end of tag
+                        shortcode.name = buffer;
 
                         buffer = "";
 
-                        readingPropName = false;
-                        readingPropVal = true;
-                        readingPropValLiteral = false;
-                    }
-
-                    continue;
-                }
-            } else if (readingPropVal) {
-                let literalClosed = false;
-
-                if (nextToken === ShortcodeParser.T_TAG_PROPERTY_VALUE_WRAPPER) {
-                    // T_TAG_PROPERTY_VALUE_WRAPPER is a character that wraps around a property value to denote a string
-                    // literal, which enables the use of spaces etc within the value.
-                    if (buffer.length === 0) {
-                        // Buffer empty, we must be opening the literal
-                        if (readingPropValLiteral) {
-                            literalClosed = true;
-                            readingPropValLiteral = false;
-                        } else {
-                            readingPropValLiteral = true;
-                            continue;
-                        }
-                    } else {
-                        // Buffer not empty, we must be closing the literal
-                        if (!readingPropValLiteral) {
-                            throw new Error('Unexpected T_TAG_PROPERTY_VALUE_WRAPPER (expected a prior start marker)');
-                        } else {
-                            literalClosed = true;
-                            readingPropValLiteral = false;
-                        }
-                    }
-                }
-
-                if (!readingPropValLiteral && (literalClosed || nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR)) {
-                    // The tag or value ends here, or the next property begins
-                    if (buffer.length || literalClosed) {
-                        properties[currentPropKey] = buffer;
-                        currentPropKey = null;
-
-                        buffer = "";
-
+                        readingName = false;
                         readingPropName = true;
-                        readingPropVal = false;
-                        readingPropValLiteral = false;
+                        continue;
+                    }
+                } else if (readingPropName) {
+                    if (nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR || nextToken === ShortcodeParser.T_TAG_PROPERTY_ASSIGN) {
+                        // The tag or prop ends here (prop with no value), or a separator token was found to start the value
+                        if (buffer.length) {
+                            currentPropKey = buffer;
+                            properties[currentPropKey] = null;
+
+                            buffer = "";
+
+                            readingPropName = false;
+                            readingPropVal = true;
+                            readingPropValLiteral = false;
+                        }
+
+                        continue;
+                    }
+                } else if (readingPropVal) {
+                    if (nextToken === ShortcodeParser.T_TAG_PROPERTY_VALUE_ESCAPE) {
+                        escapingInLiteral = true;
+                        continue;
                     }
 
-                    continue;
+                    let literalClosed = false;
+
+                    if (nextToken === ShortcodeParser.T_TAG_PROPERTY_VALUE_WRAPPER) {
+                        // T_TAG_PROPERTY_VALUE_WRAPPER is a character that wraps around a property value to denote a string
+                        // literal, which enables the use of spaces etc within the value.
+                        if (buffer.length === 0) {
+                            // Buffer empty, we must be opening the literal
+                            if (readingPropValLiteral) {
+                                literalClosed = true;
+                                readingPropValLiteral = false;
+                            } else {
+                                readingPropValLiteral = true;
+                                continue;
+                            }
+                        } else {
+                            // Buffer not empty, we must be closing the literal
+                            if (!readingPropValLiteral) {
+                                throw new Error('Unexpected T_TAG_PROPERTY_VALUE_WRAPPER (expected a prior start marker)');
+                            } else {
+                                literalClosed = true;
+                                readingPropValLiteral = false;
+                            }
+                        }
+                    }
+
+                    if (!readingPropValLiteral && (literalClosed || nothingLeft || nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR)) {
+                        // The tag or value ends here, or the next property begins
+                        if (buffer.length || literalClosed) {
+                            properties[currentPropKey] = buffer;
+                            currentPropKey = null;
+
+                            buffer = "";
+
+                            readingPropName = true;
+                            readingPropVal = false;
+                            readingPropValLiteral = false;
+                        }
+
+                        continue;
+                    }
                 }
             }
 
             if (!nothingLeft) {
                 buffer = buffer + nextToken;
+                escapingInLiteral = false;
             }
         }
 
@@ -128,8 +137,6 @@ let ShortcodeParser = {
         shortcode.properties = properties;
 
         // Step 4: If this is not a self closing tag; verify end tag is here as expected, and read the content
-        let closingTagOffset = 0;
-
         if (!shortcode.isSelfClosing) {
             let closingTagExpected = `[/${shortcode.name}]`;
 

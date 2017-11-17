@@ -44,13 +44,13 @@ describe('ShortcodeParser.parseShortcode()', function () {
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
 
-    // it('parses a shortcode with a property with escape sequence', function () {
-    //     let testInput = `[text color="red"]test[/text]`;
-    //     let expectedOutput = new Shortcode("text", "test", {"color": "red"});
-    //     let actualOutput = ShortcodeParser.parseShortcode(testInput) || null;
-    //
-    //     expect(actualOutput).to.deep.equal(expectedOutput);
-    // });
+    it('parses a shortcode with a property with escape sequence', function () {
+        let testInput = `[text color="the \\\"super escape\\\""]test[/text]`;
+        let expectedOutput = new Shortcode("text", "test", {"color": 'the "super escape"'});
+        let actualOutput = ShortcodeParser.parseShortcode(testInput) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 
     it('parses a self-closing shortcode', function () {
         let testInput = "[separator/]";
