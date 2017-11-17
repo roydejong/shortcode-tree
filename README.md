@@ -15,13 +15,11 @@ Example:
 
     ShortcodeParser.parseShortcode('[image id=123 src="bla.jpg" align="center"/]');
     
-Result:
-    
-    Shortcode {
-         name: 'image',
-         content: null,
-         properties: { id: '123', src: 'bla.jpg', align: 'center' },
-         isSelfClosing: true }
+    //  Shortcode {
+    //     name: 'image',
+    //     content: null,
+    //     properties: { id: '123', src: 'bla.jpg', align: 'center' },
+    //     isSelfClosing: true }
 
 ## Features
 
@@ -42,9 +40,10 @@ Installation with `npm`:
 
 To parse an individual short code, use the `ShortcodeParser` class:
 
-    let ShortcodeParser = require('shortcode-tree/shortcode-parser');
+    var parser = require('../src').ShortcodeParser;
     
-    let parsed = ShortcodeParser.parseShortcode("[b]example input[/b]");
+    var shortcode = parser.parseShortcode("[b]example content[/b]");
+    console.log(shortcode.content); // example content
     
 The `parseShortcode` method returns a `Shortcode` object with the following properties:
 
