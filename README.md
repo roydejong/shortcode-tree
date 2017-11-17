@@ -23,7 +23,7 @@ Result:
 
 - Parse individual BB code tags
 - Supports self-closing tags
-- Supports tag properties, with or without string literals
+- Supports tag properties, with or without string literals and escape characters
 
 ## Installation
 
