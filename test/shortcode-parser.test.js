@@ -1,5 +1,5 @@
-let ShortcodeParser = require('../src/shortcode-parser');
-let Shortcode = require('../src/shortcode');
+let ShortcodeParser = require('../src').ShortcodeParser;
+let Shortcode = require('../src').Shortcode;
 
 let {expect} = require('chai');
 
