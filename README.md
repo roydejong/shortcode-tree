@@ -60,9 +60,35 @@ The `parseShortcode` method returns a `Shortcode` object.
 | `codeText` | string | The raw shortcode text, as it was parsed. |
 | `offset` | integer | Offset index, relative to the original input string. |
 
-### Extracting multiple shortcodes from text  
+## Advanced usage
 
-If there are multiple shortcodes within one piece of text, you can extract them using the `ShortcodeExtractor`:
+### Custom parser options
+
+When calling `parseShortcode`, you can add an options object as a second argument.
+
+    parser.parseShortcode("[b]example content[/b]", { /** insert options **/ })
+
+The following options are available:
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | string | `normal` | Parser mode to operate in. See table below. |
+| `offset` | integer | `0` | Offset from the start of the input string, where parsing should begin. |
+| `throwErrors` | boolean | `true` | If enabled: On shortcode parse error, an `Error` is thrown. If disabled: `false` is returned on parse error. |  
+
+The default options are defined in `ShortcodeParser.DEFAULT_OPTIONS`.
+
+#### Parser modes
+
+| Constant | Value | Description |
+| --- | --- | --- |
+| `MODE_NORMAL` | `normal` | Parses text into a `Shortcode` object. |
+| `MODE_GET_OPENING_TAG_NAME` | `tag_name` | Halts parsing once the tag name is found, and returns it as a string. |
+
+
+### Extracting one level of shortcodes from text  
+
+The `ShortcodeExtractor` is a component that can extract a set of Shortcodes from a single piece of text, without traversing deeper than one level.
 
     var extractor = require('shortcode-tree').ShortcodeExtractor;
     
@@ -84,6 +110,4 @@ If there are multiple shortcodes within one piece of text, you can extract them 
     //     codeText: '[i]beautiful[/i]',
     //     offset: 21 } ]
 
-This method will only extract shortcodes from one level, and does not process any child tags.
-
-The `extractShortcodes` method returns an array of `Shortcode` objects.
+The `extractShortcodes` method returns an array of `Shortcode` objects. 

@@ -1,5 +1,3 @@
-let fs = require('fs');
-let util = require('util');
 let Shortcode = require('./shortcode');
 
 let ShortcodeParser = {
