@@ -94,6 +94,14 @@ describe('ShortcodeParser.parseShortcode() in normal mode', function () {
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
 
+    it('calculates the correct code text for self-closing tags in an offset string', function () {
+        let testInput = `edge case [antics/] are here`;
+        let expectedOutput = new Shortcode("antics", null, {}, true, "[antics/]", 10);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, options) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+
     it('throws an error for malformatted input: missing opening tag', function () {
         let testInput = `no opening tag`;
 

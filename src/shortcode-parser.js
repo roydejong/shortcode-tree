@@ -193,11 +193,11 @@ let ShortcodeParser = {
             offsetFromEnd = (input.length - closingTagExpected.length) - closingTagIdx;
 
             shortcode.content = input.substr(openBlockStartIdx + openBlockTextFull.length, (input.length - openBlockTextFull.length - closingTagExpected.length - offsetFromEnd));
+            shortcode.codeText = input.substr(openBlockStartIdx, input.length - offsetFromEnd);
         } else {
             shortcode.content = null;
+            shortcode.codeText = input.substr(openBlockStartIdx, openBlockTextFull.length);
         }
-
-        shortcode.codeText = input.substr(openBlockStartIdx, input.length - offsetFromEnd);
 
         return shortcode;
     }
