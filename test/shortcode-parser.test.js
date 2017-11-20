@@ -3,7 +3,7 @@ let Shortcode = require('../src').Shortcode;
 
 let {expect} = require('chai');
 
-describe('ShortcodeParser.parseShortcode()', function () {
+describe('ShortcodeParser.parseShortcode() in normal mode', function () {
     it('parses a simple shortcode with content', function () {
         let testInput = "[b]bold text[/b]";
         let expectedOutput = new Shortcode("b", "bold text", {});
@@ -74,5 +74,27 @@ describe('ShortcodeParser.parseShortcode()', function () {
         let actualOutput = ShortcodeParser.parseShortcode(testInput) || null;
 
         expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+});
+
+describe('ShortcodeParser.parseShortcode() in MODE_GET_OPENING_TAG_NAME', function () {
+    let options = {
+        mode: ShortcodeParser.MODE_GET_OPENING_TAG_NAME
+    };
+
+    it('parses a simple shortcode and returns its opening name, regardless of closing tag mismatch', function () {
+        let testInput = "[blah]bold text[/boop]";
+        let expectedOutput = "blah";
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, options) || null;
+
+        expect(actualOutput).to.equal(expectedOutput);
+    });
+
+    it('parses a self-closing shortcode and returns its opening name', function () {
+        let testInput = "[blahp/]";
+        let expectedOutput = "blahp";
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, options) || null;
+
+        expect(actualOutput).to.equal(expectedOutput);
     });
 });

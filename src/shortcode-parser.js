@@ -3,7 +3,13 @@ let util = require('util');
 let Shortcode = require('./shortcode');
 
 let ShortcodeParser = {
-    parseShortcode(input) {
+    parseShortcode(input, options) {
+        if (!options) {
+            options = ShortcodeParser.DEFAULT_OPTIONS;
+        } else {
+            options = Object.assign(ShortcodeParser.DEFAULT_OPTIONS, options);
+        }
+
         if (!input.startsWith(ShortcodeParser.T_TAG_BLOCK_START) || !input.endsWith(ShortcodeParser.T_TAG_BLOCK_END)) {
             throw new Error('parseShortcode() expects a full shortcode, from opening tag to closing tag');
         }
@@ -57,6 +63,11 @@ let ShortcodeParser = {
 
                         readingName = false;
                         readingPropName = true;
+
+                        if (options.mode === ShortcodeParser.MODE_GET_OPENING_TAG_NAME) {
+                            return shortcode.name;
+                        }
+
                         continue;
                     }
                 } else if (readingPropName) {
@@ -134,6 +145,10 @@ let ShortcodeParser = {
             throw new Error('Malformatted shortcode: Invalid opening tag');
         }
 
+        if (options.mode === ShortcodeParser.MODE_GET_OPENING_TAG_NAME) {
+            return shortcode.name;
+        }
+
         shortcode.properties = properties;
 
         // Step 4: If this is not a self closing tag; verify end tag is here as expected, and read the content
@@ -160,5 +175,12 @@ ShortcodeParser.T_TAG_PROPERTY_ASSIGN = "=";
 ShortcodeParser.T_TAG_PROPERTY_SEPARATOR = " ";
 ShortcodeParser.T_TAG_PROPERTY_VALUE_WRAPPER = '"';
 ShortcodeParser.T_TAG_PROPERTY_VALUE_ESCAPE = "\\";
+
+ShortcodeParser.MODE_NORMAL = 'normal';
+ShortcodeParser.MODE_GET_OPENING_TAG_NAME = 'tag_name';
+
+ShortcodeParser.DEFAULT_OPTIONS = {
+    mode: ShortcodeParser.MODE_NORMAL
+};
 
 module.exports = ShortcodeParser;
