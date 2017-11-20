@@ -56,4 +56,13 @@ describe('ShortcodeExtractor.extractShortcodes()', function () {
 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it('extracts a tag with nested sub-tags', function () {
+        let testInput = "Hi [row]A[row][cell]B[/cell][/row]C[/row] Bye";
+        let expectedOutput = [new Shortcode("row", "A[row][cell]B[/cell][/row]C", {}, false, "[row]A[row][cell]B[/cell][/row]C[/row]", 3)];
+
+        let actualOutput = ShortcodeExtractor.extractShortcodes(testInput) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 });
