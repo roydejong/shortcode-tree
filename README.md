@@ -39,14 +39,16 @@ Installation with `npm`:
 
 ### Parsing a single short code
 
-To parse an individual short code, use the `ShortcodeParser` class:
+To parse **one** individual short code, use the `ShortcodeParser`:
 
     var parser = require('shortcode-tree').ShortcodeParser;
     
     var shortcode = parser.parseShortcode("[b]example content[/b]");
     console.log(shortcode.content); // example content
     
-The `parseShortcode` method returns a `Shortcode` object with the following properties:
+The `parseShortcode` method returns a `Shortcode` object, as documented below.
+
+### The `Shortcode` object
 
 | Property | Type | Description |
 | --- | --- | --- |
@@ -54,6 +56,28 @@ The `parseShortcode` method returns a `Shortcode` object with the following prop
 | `properties` | object | Key/value object with property values indexed by their name |
 | `content` | string or null | The raw, unparsed content of the tag. May contain HTML and other short codes. `NULL` for self-closing tags. |
 | `isSelfClosing` | bool | Indicates whether this is a self-closing tag without any content. |
-| `codeText` | string | The raw shortcode text, as it was parsed. | 
+| `codeText` | string | The raw shortcode text, as it was parsed. |
 
+### Extracting multiple shortcodes from text  
+
+If there are multiple shortcodes within one piece of text, you can extract them using the `ShortcodeExtractor`:
+
+    var extractor = require('shortcode-tree').ShortcodeExtractor;
     
+    var shortcodes = extractor.extractShortcodes("[b]bold[/b] and [i]beautiful[/i]");
+    console.log(shortcodes);
+    
+    // [ Shortcode {
+           name: 'b',
+           content: 'bold',
+           properties: {},
+           isSelfClosing: false,
+           codeText: '[b]bold[/b]' },
+         Shortcode {
+           name: 'i',
+           content: 'beautiful',
+           properties: {},
+           isSelfClosing: false,
+           codeText: '[i]beautiful[/i]' } ]
+
+This function will only extract shortcodes from one level, and does not process any child tags.
