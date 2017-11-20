@@ -4,7 +4,7 @@
   "description": "Parser library for reading short codes (BB codes) into a tree structure",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha --reporter spec || exit 0"
+    "test": "mocha --reporter spec"
   },
   "author": "Roy de Jong <roy@softwarepunt.nl>",
   "license": "MIT",
