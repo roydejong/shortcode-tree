@@ -40,7 +40,7 @@ Installation with `npm`:
 
 To parse an individual short code, use the `ShortcodeParser` class:
 
-    var parser = require('../src').ShortcodeParser;
+    var parser = require('shortcode-tree').ShortcodeParser;
     
     var shortcode = parser.parseShortcode("[b]example content[/b]");
     console.log(shortcode.content); // example content
