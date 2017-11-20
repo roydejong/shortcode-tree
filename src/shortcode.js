@@ -7,6 +7,10 @@ class Shortcode {
         this.codeText = codeText || null;
         this.offset = offset || 0;
     }
+
+    getEndOffset() {
+        return this.offset + this.codeText.length;
+    }
 }
 
 module.exports = Shortcode;

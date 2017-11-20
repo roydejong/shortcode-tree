@@ -3,7 +3,8 @@ module.exports = {
     "ShortcodeParser": require('./shortcode-parser'),
     "ShortcodeExtractor": require('./shortcode-extractor'),
     "Shortcode": require('./shortcode'),
-    "ShortcodeNode": require('./shortcode-node')
+    "ShortcodeNode": require('./shortcode-node'),
+    "TextNode": require('./text-node')
 };
 
 module.exports.default = module.exports.ShortcodeTree;
