@@ -154,12 +154,15 @@ let ShortcodeParser = {
         // Step 4: If this is not a self closing tag; verify end tag is here as expected, and read the content
         if (!shortcode.isSelfClosing) {
             let closingTagExpected = `[/${shortcode.name}]`;
+            let closingTagIdx = input.lastIndexOf(closingTagExpected);
 
-            if (input.lastIndexOf(closingTagExpected) !== input.length - closingTagExpected.length) {
+            if (closingTagIdx === -1) {
                 throw new Error(`Malformatted shortcode: Expected closing tag: ${closingTagExpected}`);
             }
 
-            shortcode.content = input.substr(openBlockTextFull.length, (input.length - openBlockTextFull.length - closingTagExpected.length));
+            let offsetFromEnd = (input.length - closingTagExpected.length) - closingTagIdx;
+
+            shortcode.content = input.substr(openBlockTextFull.length, (input.length - openBlockTextFull.length - closingTagExpected.length - offsetFromEnd));
         } else {
             shortcode.content = null;
         }
