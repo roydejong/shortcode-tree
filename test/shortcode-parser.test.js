@@ -75,6 +75,14 @@ describe('ShortcodeParser.parseShortcode() in normal mode', function () {
 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it('parses only the first shortcode from a set of sticky shortcodes', function () {
+        let testInput = `[b]test[/b] not [i]italics[/i]`;
+        let expectedOutput = new Shortcode("b", "test", {}, false);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 });
 
 describe('ShortcodeParser.parseShortcode() in MODE_GET_OPENING_TAG_NAME', function () {
