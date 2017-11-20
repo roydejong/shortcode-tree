@@ -20,6 +20,7 @@ let ShortcodeParser = {
         }
 
         input = input.substr(openingBlockMatch.index);
+        ShortcodeParser.lastOffset = openingBlockMatch.index;
 
         // Step 1: Read the opening block without enclosing []'s
         let openBlockStartIdx = 0;
@@ -179,6 +180,8 @@ let ShortcodeParser = {
         return shortcode;
     }
 };
+
+ShortcodeParser.lastOffset = 0;
 
 ShortcodeParser.T_TAG_BLOCK_START = "[";
 ShortcodeParser.T_TAG_BLOCK_END = "]";

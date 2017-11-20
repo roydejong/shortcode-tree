@@ -34,4 +34,17 @@ describe('ShortcodeExtractor.extractShortcodes()', function () {
 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it('extracts multiple simple shortcodes on the same level, with text surrounding them', function () {
+        let testInput = "Check out my [b]boldest text[/b], but watch out for [i]bats[/i] please!";
+
+        let expectedOutput = [
+            new Shortcode("b", "boldest text", {}, false, "[b]boldest text[/b]"),
+            new Shortcode("i", "bats", {}, false, "[i]bats[/i]")
+        ];
+
+        let actualOutput = ShortcodeExtractor.extractShortcodes(testInput) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 });

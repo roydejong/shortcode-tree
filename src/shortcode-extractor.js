@@ -49,7 +49,7 @@ let ShortcodeExtractor = {
             let parsed = ShortcodeParser.parseShortcode(remainingText);
             results.push(parsed);
 
-            remainingText = remainingText.substr(parsed.codeText.length);
+            remainingText = remainingText.substr(ShortcodeParser.lastOffset + parsed.codeText.length);
         }
 
         return results;
