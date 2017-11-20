@@ -15,12 +15,13 @@ Example:
 
     ShortcodeParser.parseShortcode('[image id=123 src="bla.jpg" align="center"/]');
     
-    //  Shortcode {
+    // Shortcode {
     //     name: 'image',
     //     content: null,
     //     properties: { id: '123', src: 'bla.jpg', align: 'center' },
     //     isSelfClosing: true,
-    //     codeText: "[image id=123 src="bla.jpg" align="center"/]" }
+    //     codeText: '[image id=123 src="bla.jpg" align="center"/]',
+    //     offset: 0 }
 
 ## Features
 
@@ -46,7 +47,7 @@ To parse **one** individual short code, use the `ShortcodeParser`:
     var shortcode = parser.parseShortcode("[b]example content[/b]");
     console.log(shortcode.content); // example content
     
-The `parseShortcode` method returns a `Shortcode` object, as documented below.
+The `parseShortcode` method returns a `Shortcode` object.
 
 ### The `Shortcode` object
 
@@ -57,6 +58,7 @@ The `parseShortcode` method returns a `Shortcode` object, as documented below.
 | `content` | string or null | The raw, unparsed content of the tag. May contain HTML and other short codes. `NULL` for self-closing tags. |
 | `isSelfClosing` | bool | Indicates whether this is a self-closing tag without any content. |
 | `codeText` | string | The raw shortcode text, as it was parsed. |
+| `offset` | integer | Offset index, relative to the original input string. |
 
 ### Extracting multiple shortcodes from text  
 
@@ -64,20 +66,24 @@ If there are multiple shortcodes within one piece of text, you can extract them 
 
     var extractor = require('shortcode-tree').ShortcodeExtractor;
     
-    var shortcodes = extractor.extractShortcodes("[b]bold[/b] and [i]beautiful[/i]");
+    var shortcodes = extractor.extractShortcodes("Hey, [b]bold[/b] and [i]beautiful[/i].");
     console.log(shortcodes);
     
     // [ Shortcode {
-           name: 'b',
-           content: 'bold',
-           properties: {},
-           isSelfClosing: false,
-           codeText: '[b]bold[/b]' },
-         Shortcode {
-           name: 'i',
-           content: 'beautiful',
-           properties: {},
-           isSelfClosing: false,
-           codeText: '[i]beautiful[/i]' } ]
+    //     name: 'b',
+    //     content: 'bold',
+    //     properties: {},
+    //     isSelfClosing: false,
+    //     codeText: '[b]bold[/b]',
+    //     offset: 5 },
+    //   Shortcode {
+    //     name: 'i',
+    //     content: 'beautiful',
+    //     properties: {},
+    //     isSelfClosing: false,
+    //     codeText: '[i]beautiful[/i]',
+    //     offset: 21 } ]
 
-This function will only extract shortcodes from one level, and does not process any child tags.
+This method will only extract shortcodes from one level, and does not process any child tags.
+
+The `extractShortcodes` method returns an array of `Shortcode` objects.
