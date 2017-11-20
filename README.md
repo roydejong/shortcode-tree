@@ -19,7 +19,8 @@ Example:
     //     name: 'image',
     //     content: null,
     //     properties: { id: '123', src: 'bla.jpg', align: 'center' },
-    //     isSelfClosing: true }
+    //     isSelfClosing: true,
+    //     codeText: "[image id=123 src="bla.jpg" align="center"/]" }
 
 ## Features
 
@@ -52,6 +53,7 @@ The `parseShortcode` method returns a `Shortcode` object with the following prop
 | `name` | string | Tag name |
 | `properties` | object | Key/value object with property values indexed by their name |
 | `content` | string or null | The raw, unparsed content of the tag. May contain HTML and other short codes. `NULL` for self-closing tags. |
-| `isSelfClosing` | bool | Indicates whether this is a self-closing tag without any content. | 
+| `isSelfClosing` | bool | Indicates whether this is a self-closing tag without any content. |
+| `codeText` | string | The raw shortcode text, as it was parsed. | 
 
     
