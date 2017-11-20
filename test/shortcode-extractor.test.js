@@ -22,6 +22,15 @@ describe('ShortcodeExtractor.extractShortcodes()', function () {
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
 
+    it('extracts a self-closing shortcode with text surrounding it', function () {
+        let testInput = "Check out [img src=abc.jpg/], a cool image";
+        let expectedOutput = [new Shortcode("img", null, {"src": "abc.jpg"}, true, "[img src=abc.jpg/]", 10)];
+
+        let actualOutput = ShortcodeExtractor.extractShortcodes(testInput) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+
     it('extracts multiple simple shortcodes on the same level', function () {
         let testInput = "[b]boldest text[/b][i]bats[/i]";
 
