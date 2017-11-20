@@ -10,11 +10,16 @@ let ShortcodeParser = {
             options = Object.assign(ShortcodeParser.DEFAULT_OPTIONS, options);
         }
 
-        if (!input.startsWith(ShortcodeParser.T_TAG_BLOCK_START) || !input.endsWith(ShortcodeParser.T_TAG_BLOCK_END)) {
-            throw new Error('parseShortcode() expects a full shortcode, from opening tag to closing tag');
+        let shortcode = new Shortcode();
+
+        // Step 0: Detect the first open tag, and offset our input buffer to that position
+        let openingBlockMatch = /\[(.*?)\]/g.exec(input);
+
+        if (!openingBlockMatch) {
+            throw new Error("Could not parse shortcode: No opening tag detected.");
         }
 
-        let shortcode = new Shortcode();
+        input = input.substr(openingBlockMatch.index);
 
         // Step 1: Read the opening block without enclosing []'s
         let openBlockStartIdx = 0;
@@ -164,7 +169,7 @@ let ShortcodeParser = {
 
             offsetFromEnd = (input.length - closingTagExpected.length) - closingTagIdx;
 
-            shortcode.content = input.substr(openBlockTextFull.length, (input.length - openBlockTextFull.length - closingTagExpected.length - offsetFromEnd));
+            shortcode.content = input.substr(openBlockStartIdx + openBlockTextFull.length, (input.length - openBlockTextFull.length - closingTagExpected.length - offsetFromEnd));
         } else {
             shortcode.content = null;
         }

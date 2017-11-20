@@ -83,6 +83,14 @@ describe('ShortcodeParser.parseShortcode() in normal mode', function () {
 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it('parses the first shortcode encountered by detecting the opening tag', function () {
+        let testInput = `another offset [b]test[/b] not [i]italics[/i]`;
+        let expectedOutput = new Shortcode("b", "test", {}, false, "[b]test[/b]");
+        let actualOutput = ShortcodeParser.parseShortcode(testInput) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 });
 
 describe('ShortcodeParser.parseShortcode() in MODE_GET_OPENING_TAG_NAME', function () {
