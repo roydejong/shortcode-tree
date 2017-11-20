@@ -16,40 +16,41 @@ let ShortcodeExtractor = {
         // Worse yet, in the case of malformatted shortcodes, this won't work reliably at all. That's a TODO: Figure out how to deal with malformatted input elegantly
         const regex = /\[(.*)\]([\S\s]*)\[\/(.*)\]/g;
 
-        let m;
+        let match;
+        let resultSet = [];
 
-        let matches = [];
-
-        while ((m = regex.exec(text)) !== null) {
-            if (m.index === regex.lastIndex) {
+        while ((match = regex.exec(text)) !== null) {
+            if (match.index === regex.lastIndex) {
                 regex.lastIndex++;
             }
 
-            m.forEach((match, groupIndex) => {
-                if (groupIndex === 0) {
-                    matches = matches.concat(this.reduceShortcodeMatch(match));
-                }
-            });
+            resultSet = resultSet.concat(this.reduceShortcodeMatch(text, match.index));
         }
 
-        return matches;
+        return resultSet;
     },
 
     /**
      * Attempts to "unstick" multiple blocks matched in one piece of text.
      *
-     * @param {string} matchText
+     * @param {string} text
+     * @param {int} offset
      * @returns {array}
      */
-    reduceShortcodeMatch (matchText) {
+    reduceShortcodeMatch(text, offset) {
         let results = [];
-        let remainingText = matchText;
 
-        while (remainingText.length > 0) {
-            let parsed = ShortcodeParser.parseShortcode(remainingText);
-            results.push(parsed);
+        while (offset < text.length) {
+            let parsedShortcode = ShortcodeParser.parseShortcode(text, {offset: offset, throwErrors: false});
 
-            remainingText = remainingText.substr(ShortcodeParser.lastOffset + parsed.codeText.length);
+            if (!parsedShortcode) {
+                // Parse error
+                break;
+            }
+
+            results.push(parsedShortcode);
+
+            offset = parsedShortcode.offset + parsedShortcode.codeText.length;
         }
 
         return results;

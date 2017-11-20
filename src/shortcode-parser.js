@@ -7,20 +7,26 @@ let ShortcodeParser = {
         if (!options) {
             options = ShortcodeParser.DEFAULT_OPTIONS;
         } else {
-            options = Object.assign(ShortcodeParser.DEFAULT_OPTIONS, options);
+            options = Object.assign({}, ShortcodeParser.DEFAULT_OPTIONS, options);
         }
 
         let shortcode = new Shortcode();
 
-        // Step 0: Detect the first open tag, and offset our input buffer to that position
+        // Step 0: Apply offset from options, then increase offset as needed by looking for an opening tag
+        input = input.substr(options.offset);
+
         let openingBlockMatch = /\[(.*?)\]/g.exec(input);
 
         if (!openingBlockMatch) {
-            throw new Error("Could not parse shortcode: No opening tag detected.");
+            if (options.throwErrors) {
+                throw new Error(`Could not parse shortcode: No opening tag detected in ${input}.`);
+            } else {
+                return false;
+            }
         }
 
         input = input.substr(openingBlockMatch.index);
-        ShortcodeParser.lastOffset = openingBlockMatch.index;
+        shortcode.offset = options.offset + openingBlockMatch.index;
 
         // Step 1: Read the opening block without enclosing []'s
         let openBlockStartIdx = 0;
@@ -29,7 +35,11 @@ let ShortcodeParser = {
         let openBlockText = openBlockTextFull.substr(1, openBlockTextFull.length - 2).trim();
 
         if (!openBlockText || !openBlockText.length) {
-            throw new Error('Malformatted shortcode: Invalid or missing opening tag');
+            if (options.throwErrors) {
+                throw new Error(`Malformatted shortcode: Invalid or missing opening tag in ${input}`);
+            } else {
+                return false;
+            }
         }
 
         // Step 2: Determine if block is self closing or not
@@ -115,7 +125,11 @@ let ShortcodeParser = {
                         } else {
                             // Buffer not empty, we must be closing the literal
                             if (!readingPropValLiteral) {
-                                throw new Error('Unexpected T_TAG_PROPERTY_VALUE_WRAPPER (expected a prior start marker)');
+                                if (options.throwErrors) {
+                                    throw new Error('Unexpected T_TAG_PROPERTY_VALUE_WRAPPER (expected a prior start marker)');
+                                } else {
+                                    return false;
+                                }
                             } else {
                                 literalClosed = true;
                                 readingPropValLiteral = false;
@@ -148,7 +162,11 @@ let ShortcodeParser = {
         }
 
         if (buffer.length > 0) {
-            throw new Error('Malformatted shortcode: Invalid opening tag');
+            if (options.throwErrors) {
+                throw new Error('Malformatted shortcode: Invalid opening tag');
+            } else {
+                return false;
+            }
         }
 
         if (options.mode === ShortcodeParser.MODE_GET_OPENING_TAG_NAME) {
@@ -165,7 +183,11 @@ let ShortcodeParser = {
             let closingTagIdx = input.lastIndexOf(closingTagExpected);
 
             if (closingTagIdx === -1) {
-                throw new Error(`Malformatted shortcode: Expected closing tag: ${closingTagExpected}`);
+                if (options.throwErrors) {
+                    throw new Error(`Malformatted shortcode: Expected closing tag: ${closingTagExpected}`);
+                } else {
+                    return false;
+                }
             }
 
             offsetFromEnd = (input.length - closingTagExpected.length) - closingTagIdx;
@@ -181,8 +203,6 @@ let ShortcodeParser = {
     }
 };
 
-ShortcodeParser.lastOffset = 0;
-
 ShortcodeParser.T_TAG_BLOCK_START = "[";
 ShortcodeParser.T_TAG_BLOCK_END = "]";
 ShortcodeParser.T_TAG_CLOSER = "/";
@@ -195,7 +215,9 @@ ShortcodeParser.MODE_NORMAL = 'normal';
 ShortcodeParser.MODE_GET_OPENING_TAG_NAME = 'tag_name';
 
 ShortcodeParser.DEFAULT_OPTIONS = {
-    mode: ShortcodeParser.MODE_NORMAL
+    mode: ShortcodeParser.MODE_NORMAL,
+    offset: 0,
+    throwErrors: true
 };
 
 module.exports = ShortcodeParser;
