@@ -25,9 +25,10 @@ Example:
 
 ## Features
 
-- Parse individual BB code tags
+- Parse sets of mixed shortcodes and text/HTML into a tree structure
+- Parse individual shortcode fragments
 - Supports self-closing tags
-- Supports tag properties, with or without string literals and escape characters
+- Supports tag properties (with or without string literals)
 
 ## Installation
 
