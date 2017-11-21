@@ -11,6 +11,18 @@ class Shortcode {
     getEndOffset() {
         return this.offset + this.codeText.length;
     }
+
+    hasProperty(key) {
+        return this.properties && (typeof this.properties[key] !== "undefined");
+    }
+
+    getProperty(key) {
+        return this.hasProperty(key) ? this.properties[key] : null;
+    }
+
+    setProperty(key, value) {
+        this.properties[key] = value;
+    }
 }
 
 module.exports = Shortcode;
