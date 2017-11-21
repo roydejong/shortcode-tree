@@ -43,10 +43,16 @@ let ShortcodeExtractor = {
         let results = [];
 
         while (offset < text.length) {
-            let optionsMerged = Object.assign({}, options, {
-                offset: offset,
-                throwErrors: false
-            });
+            let optionsMerged = Object.assign(
+                {
+                    precise: true
+                },
+                options,
+                {
+                    offset: offset,
+                    throwErrors: false,
+                    mode: ShortcodeParser.MODE_NORMAL
+                });
 
             let parsedShortcode = ShortcodeParser.parseShortcode(text, optionsMerged);
 

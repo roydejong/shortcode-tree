@@ -65,4 +65,44 @@ describe('ShortcodeExtractor.extractShortcodes()', function () {
 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it('extracts multiple tags with the same name at the same level individually, without mixing them up', function () {
+        let testInput = "[column]1[/column][column]2[/column]";
+
+        let expectedOutput = [
+            new Shortcode("column", "1", {}, false, "[column]1[/column]", 0),
+            new Shortcode("column", "2", {}, false, "[column]2[/column]", 18)
+        ];
+
+        let actualOutput = ShortcodeExtractor.extractShortcodes(testInput) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+
+    it('extracts multiple tags with the same name from one level, while ignoring ones with the same name at a deeper level', function () {
+        let testInput =
+        "[column]" +
+            "[column]subA1[/column]" +
+            "[column]subA2[/column]" +
+        "[/column]" +
+        "[column]" +
+            "[column]subB1[/column]" +
+            "[column]subB2[/column]" +
+        "[/column]";
+
+        let expectedOutput = [
+            new Shortcode("column", "[column]subA1[/column][column]subA2[/column]", {}, false, "[column]" +
+                "[column]subA1[/column]" +
+                "[column]subA2[/column]" +
+                "[/column]", 0),
+            new Shortcode("column", "[column]subB1[/column][column]subB2[/column]", {}, false, "[column]" +
+                "[column]subB1[/column]" +
+                "[column]subB2[/column]" +
+                "[/column]", 61)
+        ];
+
+        let actualOutput = ShortcodeExtractor.extractShortcodes(testInput) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 });
