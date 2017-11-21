@@ -3,7 +3,7 @@ let Shortcode = require('../src').Shortcode;
 
 let {expect} = require('chai');
 
-describe('ShortcodeParser.parseShortcode() in normal mode', function () {
+describe('ShortcodeParser.parseShortcode() with defaults (fast mode)', function () {
     let options = ShortcodeParser.DEFAULT_OPTIONS;
 
     it('parses a simple shortcode with content', function () {
@@ -172,5 +172,25 @@ describe('ShortcodeParser.parseShortcode() with modified options', function () {
         let actualOutput = ShortcodeParser.parseShortcode(testInput, { throwErrors: false });
 
         expect(actualOutput).to.equal(expectedOutput);
+    });
+});
+
+describe('ShortcodeParser.parseShortcode() in "precise" mode', function () {
+    it('correctly parses a tag with same-name tags on that level', function () {
+        let testInput = "[col]a[/col][col]b[/col][col]c[/col]";
+
+        let expectedOutput = new Shortcode('col', 'a', {}, false, "[col]a[/col]", 0);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, { precise: true }) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+
+    it('correctly parses a tag with same-name tags as its children', function () {
+        let testInput = "[col]text [col]deeper col[/col] content[/col]";
+
+        let expectedOutput = new Shortcode('col', 'text [col]deeper col[/col] content', {}, false, "[col]text [col]deeper col[/col] content[/col]", 0);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, { precise: true }) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
     });
 });

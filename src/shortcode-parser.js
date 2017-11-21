@@ -51,6 +51,115 @@ let ShortcodeParser = {
         }
 
         // Step 3: Read the block's name and properties by tokenizing it
+        if (this.tokenizeOpenBlock(shortcode, openBlockText, options) === false) {
+            return false;
+        }
+
+        if (options.mode === ShortcodeParser.MODE_GET_OPENING_TAG_NAME) {
+            return shortcode.name;
+        }
+
+        // Step 4: If we are in fast mode, try reading forward until we find the closing tag.
+        //  Otherwise, if we are in precise mode, keep parsing everything past our tag until we find *our* closing tag.
+        let closingTagExpected = `[/${shortcode.name}]`;
+
+        if (options.precise) {
+            let stackLevel = 0;
+
+            let bufferRemainder = input.substr(openBlockTextFull.length);
+            let bufferContent = "";
+            let closingTagFound = null;
+
+            let subParseOptions = Object.assign({}, options, {
+                throwErrors: false,
+                mode: ShortcodeParser.MODE_GET_OPENING_TAG_NAME
+            });
+
+            while (bufferRemainder.length > 0) {
+                // Keep iterating the remainder of the input buffer, looking for any other closing or opening tags
+                let nextBlockMatch = /\[(.*?)\]/g.exec(bufferRemainder);
+
+                if (!nextBlockMatch) {
+                    // No more tags found, end of input
+                    break;
+                }
+
+                let nextBlockIdx = nextBlockMatch.index;
+                let nextBlockText = nextBlockMatch[0];
+                let nextBlockTextInner = nextBlockText.substr(1, nextBlockText.length - 2).trim();
+                let nextBlockLen = nextBlockText.length;
+
+                if (nextBlockTextInner.startsWith("/")) {
+                    // Closing tag
+                    if (stackLevel === 0) {
+                        if (nextBlockText !== closingTagExpected) {
+                            if (options.throwErrors) {
+                                throw new Error(`Malformatted shortcode: Inconsistent closing tag. Expected closing tag: ${closingTagExpected}, but found ${nextBlockText}`);
+                            } else {
+                                return false;
+                            }
+                        }
+
+                        closingTagFound = nextBlockText;
+
+                        bufferContent += bufferRemainder.substr(0, nextBlockIdx);
+                        break;
+                    } else {
+                        stackLevel--;
+                    }
+                } else {
+                    // Open tag
+                    let nameTarget = new Shortcode();
+
+                    if (this.tokenizeOpenBlock(nameTarget, nextBlockTextInner, subParseOptions) !== false) {
+                        let blockName = nameTarget.name;
+                        stackLevel++;
+                    }
+                }
+
+                // Modify the buffer to subtract this tag, and add it to the tag's content buffer
+                bufferContent += bufferRemainder.substr(0, nextBlockIdx + nextBlockLen);
+                bufferRemainder = bufferRemainder.substr(nextBlockIdx + nextBlockLen);
+            }
+
+            if (!closingTagFound) {
+                if (options.throwErrors) {
+                    throw new Error(`Malformatted shortcode: Unexpected end of input. Expected closing tag: ${closingTagExpected}`);
+                } else {
+                    return false;
+                }
+            }
+
+            shortcode.content = bufferContent;
+            shortcode.codeText = openBlockTextFull + shortcode.content + closingTagExpected;
+        } else {
+            let offsetFromEnd = 0;
+
+            if (!shortcode.isSelfClosing) {
+                let closingTagIdx = input.indexOf(closingTagExpected);
+
+                if (closingTagIdx === -1) {
+                    if (options.throwErrors) {
+                        throw new Error(`Malformatted shortcode: Expected closing tag: ${closingTagExpected}`);
+                    } else {
+                        return false;
+                    }
+                }
+
+                offsetFromEnd = (input.length - closingTagExpected.length) - closingTagIdx;
+
+                shortcode.content = input.substr(openBlockStartIdx + openBlockTextFull.length, (input.length - openBlockTextFull.length - closingTagExpected.length - offsetFromEnd));
+                shortcode.codeText = input.substr(openBlockStartIdx, input.length - offsetFromEnd);
+            } else {
+                shortcode.content = null;
+                shortcode.codeText = input.substr(openBlockStartIdx, openBlockTextFull.length);
+            }
+        }
+
+        return shortcode;
+    },
+
+    tokenizeOpenBlock(shortcode, openBlockText, options) {
         let buffer = "";
 
         let readingName = true;
@@ -79,7 +188,7 @@ let ShortcodeParser = {
                         readingPropName = true;
 
                         if (options.mode === ShortcodeParser.MODE_GET_OPENING_TAG_NAME) {
-                            return shortcode.name;
+                            return;
                         }
 
                         continue;
@@ -167,37 +276,7 @@ let ShortcodeParser = {
             }
         }
 
-        if (options.mode === ShortcodeParser.MODE_GET_OPENING_TAG_NAME) {
-            return shortcode.name;
-        }
-
         shortcode.properties = properties;
-
-        // Step 4: If this is not a self closing tag; verify end tag is here as expected, and read the content
-        let offsetFromEnd = 0;
-
-        if (!shortcode.isSelfClosing) {
-            let closingTagExpected = `[/${shortcode.name}]`;
-            let closingTagIdx = input.lastIndexOf(closingTagExpected);
-
-            if (closingTagIdx === -1) {
-                if (options.throwErrors) {
-                    throw new Error(`Malformatted shortcode: Expected closing tag: ${closingTagExpected}`);
-                } else {
-                    return false;
-                }
-            }
-
-            offsetFromEnd = (input.length - closingTagExpected.length) - closingTagIdx;
-
-            shortcode.content = input.substr(openBlockStartIdx + openBlockTextFull.length, (input.length - openBlockTextFull.length - closingTagExpected.length - offsetFromEnd));
-            shortcode.codeText = input.substr(openBlockStartIdx, input.length - offsetFromEnd);
-        } else {
-            shortcode.content = null;
-            shortcode.codeText = input.substr(openBlockStartIdx, openBlockTextFull.length);
-        }
-
-        return shortcode;
     }
 };
 
@@ -215,7 +294,8 @@ ShortcodeParser.MODE_GET_OPENING_TAG_NAME = 'tag_name';
 ShortcodeParser.DEFAULT_OPTIONS = {
     mode: ShortcodeParser.MODE_NORMAL,
     offset: 0,
-    throwErrors: true
+    throwErrors: true,
+    precise: false
 };
 
 module.exports = ShortcodeParser;

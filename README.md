@@ -74,7 +74,8 @@ The following options are available:
 | --- | --- | --- | --- |
 | `mode` | string | `normal` | Parser mode to operate in. See table below. |
 | `offset` | integer | `0` | Offset from the start of the input string, where parsing should begin. |
-| `throwErrors` | boolean | `true` | If enabled: On shortcode parse error, an `Error` is thrown. If disabled: `false` is returned on parse error. |  
+| `throwErrors` | boolean | `true` | If enabled: On shortcode parse error, an `Error` is thrown. If disabled: `false` is returned on parse error. |
+| `precise` | boolean | `false` | If things aren't working as expected, enable this for deep recursive parsing. Reduces performance exponentially. |  
 
 The default options are defined in `ShortcodeParser.DEFAULT_OPTIONS`.
 
