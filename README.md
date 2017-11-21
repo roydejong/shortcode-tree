@@ -35,10 +35,81 @@ Installation with `npm`:
 
     npm install shortcode-tree --save
     
-
 ## Usage
 
-### Parsing a single short code
+Start with the raw text you want to process, and feed it to the `parse` function:
+
+    var ShortcodeTree = require('shortcode-tree').ShortcodeTree;
+    
+    var rootNode = ShortcodeTree.parse(inputText);
+    console.log(rootNode.children.length);
+    
+This function will return a `ShortcodeNode` object. Each `ShortcodeNode` may contain a set of child nodes.
+
+If you have regular text or HTML mixed in at the same level as a shortcode, a `ShortcodeNode` may also contain `TextNode` children to hold these items. Text nodes themselves cannot hold children, only text.
+
+### The `ShortcodeNode` object
+
+A shortcode node contains the following properties:
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `text` | string | The raw text content (code) of this node. |
+| `shortcode` | `Shortcode` or null | Information about the parsed Shortcode represented by this node. Will be `null` if this is the root node. |
+| `children` | array | List of children. May contain `ShortcodeNode` and `TextNode` items. |
+
+### The `Shortcode` object
+
+A parsed shortcode. Typically available through the `shortcode` property of a shortcode node.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `name` | string | Tag name |
+| `properties` | object | Key/value object with property values indexed by their name |
+| `content` | string or null | The raw, unparsed content of the tag. May contain HTML and other short codes. `NULL` for self-closing tags. |
+| `isSelfClosing` | bool | Indicates whether this is a self-closing tag without any content. |
+| `codeText` | string | The raw shortcode text, as it was parsed. |
+| `offset` | integer | Offset index, relative to the original input string. | 
+
+### The `TextNode` object
+
+A piece of raw text or HTML that was placed on the same level as another shortcode. This is always a child of a shortcode node.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `text` | string | Raw text or code |
+
+### Dumping tree structure
+
+By calling `traceTree()` on a node, you can dump a simple visualisation of the parsed tree structure.
+
+    var sampleInput =
+        "[row]" +
+            "[col]" +
+                "<h1>My article</h1>" +
+                "[img src=\"image.jpg\"/]" +
+            "[/col]" +
+            "[col]" +
+                "<p>Just a boring text sample column</p>" +
+            "[/col]" +
+        "[/row]"
+
+    var rootNode = ShortcodeTree.parse(sampleInput);
+    rootNode.traceTree();
+    
+The above example would generate the following console output:
+
+    +++++ Root Node +++++
+    [Shortcode Node: row], content: [col]<h1>My article</h1>[img src="image.jpg"/][/col][col]<p>Just a boring text sample column</p>[/col]
+    --- [Shortcode Node: col], content: <h1>My article</h1>[img src="image.jpg"/]
+    ------ [Text Node], content: <h1>My article</h1>
+    ------ [Shortcode Node: img], content: null
+    --- [Shortcode Node: col], content: <p>Just a boring text sample column</p>
+
+
+## Advanced usage
+
+### Parsing a single short code fragment
 
 To parse **one** individual short code, use the `ShortcodeParser`:
 
@@ -49,22 +120,9 @@ To parse **one** individual short code, use the `ShortcodeParser`:
     
 The `parseShortcode` method returns a `Shortcode` object.
 
-### The `Shortcode` object
-
-| Property | Type | Description |
-| --- | --- | --- |
-| `name` | string | Tag name |
-| `properties` | object | Key/value object with property values indexed by their name |
-| `content` | string or null | The raw, unparsed content of the tag. May contain HTML and other short codes. `NULL` for self-closing tags. |
-| `isSelfClosing` | bool | Indicates whether this is a self-closing tag without any content. |
-| `codeText` | string | The raw shortcode text, as it was parsed. |
-| `offset` | integer | Offset index, relative to the original input string. |
-
-## Advanced usage
-
 ### Custom parser options
 
-When calling `parseShortcode`, you can add an options object as a second argument.
+When calling `parseShortcode`, you can add an `options` object as a second argument.
 
     parser.parseShortcode("[b]example content[/b]", { /** insert options **/ })
 
@@ -85,7 +143,6 @@ The default options are defined in `ShortcodeParser.DEFAULT_OPTIONS`.
 | --- | --- | --- |
 | `MODE_NORMAL` | `normal` | Parses text into a `Shortcode` object. |
 | `MODE_GET_OPENING_TAG_NAME` | `tag_name` | Halts parsing once the tag name is found, and returns it as a string. |
-
 
 ### Extracting one level of shortcodes from text  
 
