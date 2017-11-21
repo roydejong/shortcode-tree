@@ -10,7 +10,7 @@ let ShortcodeParser = {
 
         let shortcode = new Shortcode();
 
-        // Step 0: Apply offset from options, then increase offset as needed by looking for an opening tag
+        // Step 1: Apply offset from options, then increase offset as needed by looking for an opening tag
         input = input.substr(options.offset);
 
         let openingBlockMatch = /\[(.*?)\]/g.exec(input);
@@ -26,13 +26,13 @@ let ShortcodeParser = {
         input = input.substr(openingBlockMatch.index);
         shortcode.offset = options.offset + openingBlockMatch.index;
 
-        // Step 1: Read the opening block without enclosing []'s
+        // Step 2: Read the opening block without enclosing []'s
         let openBlockStartIdx = 0;
         let openBlockEndIdx = input.indexOf(ShortcodeParser.T_TAG_BLOCK_END);
         let openBlockTextFull = input.substr(openBlockStartIdx, openBlockEndIdx + 1);
-        let openBlockText = openBlockTextFull.substr(1, openBlockTextFull.length - 2).trim();
+        let openBlockInner = openBlockTextFull.substr(1, openBlockTextFull.length - 2).trim();
 
-        if (!openBlockText || !openBlockText.length) {
+        if (!openBlockInner || !openBlockInner.length) {
             if (options.throwErrors) {
                 throw new Error(`Malformatted shortcode: Invalid or missing opening tag in ${input}`);
             } else {
@@ -40,18 +40,8 @@ let ShortcodeParser = {
             }
         }
 
-        // Step 2: Determine if block is self closing or not
-        let selfCloseIdx = openBlockText.lastIndexOf(ShortcodeParser.T_TAG_CLOSER);
-
-        if (selfCloseIdx === openBlockEndIdx - 2) {
-            // Last character before closing tag is the self-closing indicator
-            // Mark shortcode as self closing, and remove the closer token from our buffer
-            shortcode.isSelfClosing = true;
-            openBlockText = openBlockText.substr(0, openBlockText.length - 1).trim();
-        }
-
         // Step 3: Read the block's name and properties by tokenizing it
-        if (this.tokenizeOpenBlock(shortcode, openBlockText, options) === false) {
+        if (this.tokenizeOpenBlock(shortcode, openBlockInner, options) === false) {
             return false;
         }
 
@@ -63,7 +53,7 @@ let ShortcodeParser = {
         //  Otherwise, if we are in precise mode, keep parsing everything past our tag until we find *our* closing tag.
         let closingTagExpected = `[/${shortcode.name}]`;
 
-        if (options.precise) {
+        if (options.precise && !shortcode.isSelfClosing) {
             let stackLevel = 0;
 
             let bufferRemainder = input.substr(openBlockTextFull.length);
@@ -72,7 +62,7 @@ let ShortcodeParser = {
 
             let subParseOptions = Object.assign({}, options, {
                 throwErrors: false,
-                mode: ShortcodeParser.MODE_GET_OPENING_TAG_NAME
+                mode: ShortcodeParser.MODE_NORMAL
             });
 
             while (bufferRemainder.length > 0) {
@@ -109,11 +99,15 @@ let ShortcodeParser = {
                     }
                 } else {
                     // Open tag
-                    let nameTarget = new Shortcode();
+                    let nextBlockInfo = new Shortcode();
 
-                    if (this.tokenizeOpenBlock(nameTarget, nextBlockTextInner, subParseOptions) !== false) {
-                        let blockName = nameTarget.name;
-                        stackLevel++;
+                    if (this.tokenizeOpenBlock(nextBlockInfo, nextBlockTextInner, subParseOptions) !== false) {
+                        let blockName = nextBlockInfo.name;
+                        // console.log(nextBlockInfo);
+
+                        if (!nextBlockInfo.isSelfClosing) {
+                            stackLevel++;
+                        }
                     }
                 }
 
@@ -159,7 +153,18 @@ let ShortcodeParser = {
         return shortcode;
     },
 
-    tokenizeOpenBlock(shortcode, openBlockText, options) {
+    tokenizeOpenBlock(shortcode, openBlockInner, options) {
+        // First, determine if block is self closing or not
+        let selfCloseIdx = openBlockInner.lastIndexOf(ShortcodeParser.T_TAG_CLOSER);
+
+        if (selfCloseIdx === openBlockInner.length - 1) {
+            // Last character before closing tag is the self-closing indicator
+            // Mark shortcode as self closing, and remove the closer token from our buffer
+            shortcode.isSelfClosing = true;
+            openBlockInner = openBlockInner.substr(0, openBlockInner.length - 1).trim();
+        }
+
+        // Start tokenization process
         let buffer = "";
 
         let readingName = true;
@@ -172,8 +177,8 @@ let ShortcodeParser = {
 
         let currentPropKey = null;
 
-        for (let index = 0; index <= openBlockText.length; index++) {
-            let nextToken = openBlockText[index];
+        for (let index = 0; index <= openBlockInner.length; index++) {
+            let nextToken = openBlockInner[index];
             let nothingLeft = (typeof nextToken === "undefined");
 
             if (!escapingInLiteral) {

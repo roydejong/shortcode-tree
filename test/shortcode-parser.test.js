@@ -193,4 +193,22 @@ describe('ShortcodeParser.parseShortcode() in "precise" mode', function () {
 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it('correctly parses self-closing short tags', function () {
+        let testInput = "blah [img bla=123/] argh";
+
+        let expectedOutput = new Shortcode('img', null, {"bla": "123"}, true, "[img bla=123/]", 5);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, { precise: true }) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+
+    it('correctly parses self-closing short tags as children', function () {
+        let testInput = "[col][img bla=123/][/col]";
+
+        let expectedOutput = new Shortcode('col', '[img bla=123/]', {}, false, "[col][img bla=123/][/col]", 0);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, { precise: true }) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 });
