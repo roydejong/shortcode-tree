@@ -1,7 +1,7 @@
 # shortcode-tree
 A node.js parser library for reading shortcodes.
 
-[![npm](https://img.shields.io/npm/v/github.svg)](https://www.npmjs.com/package/shortcode-tree)
+[![npm](https://img.shields.io/npm/v/shortcode-tree.svg)](https://www.npmjs.com/package/shortcode-tree)
 [![Build Status](https://travis-ci.org/roydejong/shortcode-tree.svg?branch=master)](https://travis-ci.org/roydejong/shortcode-tree)
 
 ## Introduction
