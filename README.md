@@ -29,6 +29,7 @@ Example:
 - Parse individual shortcode fragments
 - Supports self-closing tags
 - Supports tag properties (with or without string literals)
+- Stringify `Shortcode` objects to shortcode text
 
 ## Installation
 
@@ -51,9 +52,9 @@ If you have regular text or HTML mixed in at the same level as a shortcode, a `S
 
 ### The `ShortcodeNode` object
 
-A shortcode node contains the following properties:
+A shortcode node contains the following fields:
 
-| Property | Type | Description |
+| Field | Type | Description |
 | --- | --- | --- |
 | `text` | string | The raw text content (code) of this node. |
 | `shortcode` | `Shortcode` or null | Information about the parsed Shortcode represented by this node. Will be `null` if this is the root node. |
@@ -61,22 +62,33 @@ A shortcode node contains the following properties:
 
 ### The `Shortcode` object
 
-A parsed shortcode. Typically available through the `shortcode` property of a shortcode node.
+A parsed shortcode. Typically available through the `shortcode` field of a shortcode node.
 
-| Property | Type | Description |
+#### Fields
+
+| Field | Type | Description |
 | --- | --- | --- |
 | `name` | string | Tag name |
 | `properties` | object | Key/value object with property values indexed by their name |
 | `content` | string or null | The raw, unparsed content of the tag. May contain HTML and other short codes. `NULL` for self-closing tags. |
 | `isSelfClosing` | bool | Indicates whether this is a self-closing tag without any content. |
 | `codeText` | string | The raw shortcode text, as it was parsed. |
-| `offset` | integer | Offset index, relative to the original input string. | 
+| `offset` | integer | Offset index, relative to the original input string. |
+
+#### Methods
+
+| Signature | Returns | Description |
+| --- | --- | --- |
+| `stringify()` | string | Formats the data in the `Shortcode` object to shortcode text |
+| `hasProperty([string] key)` | boolean | Gets whether property with name `key` exists. |
+| `getProperty([string] key)` | value or null | Gets value of property with name `key`, or NULL if not set. |
+| `setProperty([string] key, value)` | void | Add or update property with given key and value. |  
 
 ### The `TextNode` object
 
 A piece of raw text or HTML that was placed on the same level as another shortcode. This is always a child of a shortcode node.
 
-| Property | Type | Description |
+| Field | Type | Description |
 | --- | --- | --- |
 | `text` | string | Raw text or code |
 

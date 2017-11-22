@@ -1,3 +1,5 @@
+let ShortcodeFormatter = require('./shortcode-formatter');
+
 class Shortcode {
     constructor (name, content, properties, isSelfClosing, codeText, offset) {
         this.name = name || null;
@@ -22,6 +24,14 @@ class Shortcode {
 
     setProperty(key, value) {
         this.properties[key] = value;
+    }
+
+    stringify() {
+        return ShortcodeFormatter.stringify(this);
+    }
+
+    toString() {
+        return this.stringify();
     }
 }
 
