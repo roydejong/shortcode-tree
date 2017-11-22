@@ -52,7 +52,7 @@ let ShortcodeTree = {
             anyChildNodes = true;
 
             // Recursive loop: Traverse the child node as well
-            this.traverseNode(_shortcodeNode);
+            this.traverseNode(_shortcodeNode, options);
         }
 
         // Text node any remaining length, if there were any child nodes
