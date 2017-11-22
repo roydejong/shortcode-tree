@@ -282,6 +282,12 @@ let ShortcodeParser = {
         }
 
         shortcode.properties = properties;
+
+        if (!shortcode.isSelfClosing && options.selfClosingTags.indexOf(shortcode.name) > -1) {
+            // Explicitly listed in options as a naughty, misbehaving self-closing tag
+            // This is one unfortunate scenario where we simply cannot parse blindly :-(
+            shortcode.isSelfClosing = true;
+        }
     }
 };
 
@@ -297,10 +303,45 @@ ShortcodeParser.MODE_NORMAL = 'normal';
 ShortcodeParser.MODE_GET_OPENING_TAG_NAME = 'tag_name';
 
 ShortcodeParser.DEFAULT_OPTIONS = {
+    /**
+     * Parser mode to operate under.
+     *
+     * @type string
+     */
     mode: ShortcodeParser.MODE_NORMAL,
+
+    /**
+     * Offset to begin parsing from, relative to input string.
+     *
+     * @type int
+     */
     offset: 0,
+
+    /**
+     * If true, throw errors if there is a syntax problem.
+     * If false, return false and fail silently.
+     *
+     * @type boolean
+     */
     throwErrors: true,
-    precise: false
+
+    /**
+     * If true, perform recursive parsing for each tag.
+     * This will ensure that the tag hierarchy is correctly understood, but more performance heavy.
+     *
+     * Precise mode is more accurate, but more performance heavy and breaks easier if shortcode syntax is unpredictable.
+     *
+     * @type boolean
+     */
+    precise: false,
+
+    /**
+     * A list of tag names that the parser always treats as self closing, without content or closing tag.
+     * This needs to be supplied if self-closing tags do not include the "[selfcloser/]" style syntax.
+     *
+     * @type array
+     */
+    selfClosingTags: []
 };
 
 module.exports = ShortcodeParser;
