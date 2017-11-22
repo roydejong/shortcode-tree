@@ -82,7 +82,9 @@ A parsed shortcode. Typically available through the `shortcode` field of a short
 | `stringify()` | string | Formats the data in the `Shortcode` object to shortcode text |
 | `hasProperty([string] key)` | boolean | Gets whether property with name `key` exists. |
 | `getProperty([string] key)` | value or null | Gets value of property with name `key`, or NULL if not set. |
-| `setProperty([string] key, value)` | void | Add or update property with given key and value. |  
+| `setProperty([string] key, value)` | void | Add or update property with given key and value. |
+| `addChild([Shortcode] shortcode)` | void | Append a `shortcode` item to this shortcode's content using stringify. |
+| `appendContent([string] content)` | void | Append content to the existing content. |  
 
 ### The `TextNode` object
 
