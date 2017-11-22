@@ -104,4 +104,18 @@ describe('ShortcodeTree.parse()', function () {
         let actualOutput = ShortcodeTree.parse(testInputAll);
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it ('passes options, and handles self-closing tags with inconsistent syntax correctly', function () {
+        let testInput = `[vc_column][mk_image src="test.jpg" align="center"][/vc_column]`;
+
+        let options = {
+            selfClosingTags: ["mk_image"]
+        };
+
+        let parsed = ShortcodeTree.parse(testInput, options);
+        expect(parsed.children.length).to.equal(1);
+
+        let columnNode = parsed.children[0];
+        expect(columnNode.children.length).to.equal(1);
+    });
 });
