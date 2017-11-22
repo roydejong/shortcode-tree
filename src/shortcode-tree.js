@@ -9,13 +9,14 @@ let ShortcodeTree = {
     /**
      * Parses input text into a tree structure.
      *
-     * @param {string} input
+     * @param {string} input Text input to parse.
+     * @param {object|null} options Parser options.
      * @return {ShortcodeNode}
      */
-    parse(input) {
+    parse(input, options) {
         let rootNode = new ShortcodeNode(input);
 
-        this.traverseNode(rootNode);
+        this.traverseNode(rootNode, options);
 
         return rootNode;
     },
@@ -24,10 +25,11 @@ let ShortcodeTree = {
      * Traverses a tree node: extracts short codes from the node text, and traverses its child nodes.
      *
      * @param {ShortcodeNode} node
+     * @param {object|null} options Parser options.
      */
-    traverseNode(node) {
+    traverseNode(node, options) {
         // Extract shortcodes from this node's raw text
-        let shortcodesExtracted = ShortcodeExtractor.extractShortcodes(node.text);
+        let shortcodesExtracted = ShortcodeExtractor.extractShortcodes(node.text, options);
         let lastEndIndex = 0;
         let anyChildNodes = false;
 
