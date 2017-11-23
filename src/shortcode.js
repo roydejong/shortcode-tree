@@ -103,6 +103,10 @@ class Shortcode {
      * @param {string} content
      */
     appendContent(content) {
+        if (!this.content) {
+            this.content = "";
+        }
+
         this.content += content;
     }
 
