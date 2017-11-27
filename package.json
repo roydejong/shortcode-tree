@@ -1,12 +1,12 @@
 {
   "name": "shortcode-tree",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Parser library for reading short codes (BB codes) into a tree structure",
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha --reporter spec",
     "build": "babel src --presets babel-preset-es2015 --out-dir dist",
-    "prepublishOnly": "npm run build"
+    "prepare": "npm run build"
   },
   "author": "Roy de Jong <roy@softwarepunt.nl>",
   "license": "MIT",
