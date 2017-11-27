@@ -30,6 +30,7 @@ Example:
 - Supports self-closing tags
 - Supports tag properties (with or without string literals)
 - Stringify `Shortcode` objects to shortcode text
+- Extract only text / HTML from a document containg shortcodes
 
 ## Installation
 
@@ -185,3 +186,12 @@ The `ShortcodeExtractor` is a component that can extract a set of Shortcodes fro
     //     offset: 21 } ]
 
 The `extractShortcodes` method returns an array of `Shortcode` objects. 
+
+### Extracting text/HTML from a shortcode fragment
+    
+    var treeParser = require('shortcode-tree').ShortcodeTree;
+
+    var input = `root [row][column]deep[/column][/row]`;
+    treeParser.extractTextContent(input);
+   
+    // returns: "root deep"
