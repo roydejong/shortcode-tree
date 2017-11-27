@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --reporter spec",
     "build": "babel src --presets babel-preset-es2015 --out-dir dist",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "author": "Roy de Jong <roy@softwarepunt.nl>",
   "license": "MIT",
