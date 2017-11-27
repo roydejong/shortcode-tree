@@ -119,3 +119,39 @@ describe('ShortcodeTree.parse()', function () {
         expect(columnNode.children.length).to.equal(1);
     });
 });
+
+
+describe('ShortcodeTree.extractTextContent()', function () {
+    it ('leaves plain text alone', function () {
+        let testInput = `blah blah`;
+        let expectedOutput = testInput;
+        let actualOutput = ShortcodeTree.extractTextContent(testInput);
+
+        expect(actualOutput).to.equal(expectedOutput);
+    });
+
+    it ('strips code text from a simple shortcode', function () {
+        let testInputInner = 'blah <b>blah</b> blah';
+        let testInput = `[b]${testInputInner}[/b]`;
+        let expectedOutput = testInputInner;
+        let actualOutput = ShortcodeTree.extractTextContent(testInput);
+
+        expect(actualOutput).to.equal(expectedOutput);
+    });
+
+    it ('strips code text from deep nested shortcodes', function () {
+        let testInput = `root [row][column]deep[/column][/row]`;
+        let expectedOutput = "root deep";
+        let actualOutput = ShortcodeTree.extractTextContent(testInput);
+
+        expect(actualOutput).to.equal(expectedOutput);
+    });
+
+    it ('adds automatic spaces between text from different nesting levels', function () {
+        let testInput = `[page][row][col]<h1>some text</h1>[img/][sub]bla[/sub]w[/col]a[/row]w[/page]`;
+        let expectedOutput = "<h1>some text</h1> bla w a w";
+        let actualOutput = ShortcodeTree.extractTextContent(testInput);
+
+        expect(actualOutput).to.equal(expectedOutput);
+    });
+});

@@ -64,6 +64,39 @@ let ShortcodeTree = {
                 node.addChild(new TextNode(node.text.substr(lastEndIndex, remainingLen)));
             }
         }
+    },
+
+    extractTextContent(input) {
+        let treeRootNode = this.parse(input);
+        let textContent = "";
+
+        let fnTraverseNodeForContent = function (node) {
+            let appendText = null;
+
+            if (node instanceof TextNode) {
+                appendText = node.text;
+            } else if (node instanceof ShortcodeNode) {
+                if (node.children.length) {
+                    node.children.forEach(node => {
+                        fnTraverseNodeForContent(node);
+                    });
+                } else {
+                    // Topmost node with no children
+                    appendText = node.text;
+                }
+            }
+
+            if (appendText && appendText.length) {
+                if (textContent.length && !textContent.endsWith(' ')) {
+                    textContent += ' ';
+                }
+
+                textContent += appendText;
+            }
+        };
+
+        fnTraverseNodeForContent(treeRootNode);
+        return textContent;
     }
 };
 
