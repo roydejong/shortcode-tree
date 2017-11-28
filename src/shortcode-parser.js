@@ -53,7 +53,15 @@ let ShortcodeParser = {
         //  Otherwise, if we are in precise mode, keep parsing everything past our tag until we find *our* closing tag.
         let closingTagExpected = `[/${shortcode.name}]`;
 
-        if (options.precise && !shortcode.isSelfClosing) {
+        if (shortcode.isSelfClosing && input.substr(openBlockTextFull.length, closingTagExpected.length) === closingTagExpected) {
+            // Special case: misbehaving little bugger claims to be improperly self-closing, but decided to close itself
+            // anyway. I've seen this happen in the wild, and it sucks, so we'll try to deal with it.
+            let closingTagIdx = openBlockTextFull.length;
+            let offsetFromEnd = (input.length - closingTagExpected.length) - closingTagIdx;
+
+            shortcode.content = input.substr(openBlockStartIdx + openBlockTextFull.length, (input.length - openBlockTextFull.length - closingTagExpected.length - offsetFromEnd));
+            shortcode.codeText = input.substr(openBlockStartIdx, input.length - offsetFromEnd);
+        } else if (options.precise && !shortcode.isSelfClosing) {
             let stackLevel = 0;
 
             let bufferRemainder = input.substr(openBlockTextFull.length);

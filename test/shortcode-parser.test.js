@@ -181,6 +181,14 @@ describe('ShortcodeParser.parseShortcode() with modified options', function () {
 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it('supports parsing self-closing tags without valid syntax, with list supplement, without tripping over tags that decide to have a closer anyway', function () {
+        let testInput = `[img src="what.jpg" standards="no"][/img] asdf`;
+        let expectedOutput = new Shortcode('img', "", {"src": "what.jpg", "standards": "no"}, true, `[img src="what.jpg" standards="no"][/img]`, 0);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, { selfClosingTags: ["img"] }) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 });
 
 describe('ShortcodeParser.parseShortcode() in "precise" mode', function () {
