@@ -110,12 +110,13 @@ describe('ShortcodeParser.parseShortcode() with defaults (fast mode)', function 
         }).to.throw("opening tag");
     });
 
-    it('throws an error for malformatted input: invalid closing tag', function () {
+    it('does not error / performs best guess for malformatted input: invalid/missing closing tag', function () {
         let testInput = `we [open] but no [/close]`;
 
-        expect(function () {
-            ShortcodeParser.parseShortcode(testInput, options)
-        }).to.throw("closing tag");
+        let expectedOutput = new Shortcode("open", null, {}, true, "[open]", 3);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, options) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
     });
 
     it('throws an error for malformatted input: invalid opening tag', function () {
@@ -167,7 +168,7 @@ describe('ShortcodeParser.parseShortcode() with modified options', function () {
     });
 
     it('does not throw errors if "throwErrors" is set to false', function () {
-        let testInput = "this might be [b]invalid";
+        let testInput = "this might be [invalid";
         let expectedOutput = false;
         let actualOutput = ShortcodeParser.parseShortcode(testInput, { throwErrors: false });
 
@@ -184,7 +185,7 @@ describe('ShortcodeParser.parseShortcode() with modified options', function () {
 
     it('supports parsing self-closing tags without valid syntax, with list supplement, without tripping over tags that decide to have a closer anyway', function () {
         let testInput = `[img src="what.jpg" standards="no"][/img] asdf`;
-        let expectedOutput = new Shortcode('img', "", {"src": "what.jpg", "standards": "no"}, true, `[img src="what.jpg" standards="no"][/img]`, 0);
+        let expectedOutput = new Shortcode('img', "", {"src": "what.jpg", "standards": "no"}, false, `[img src="what.jpg" standards="no"][/img]`, 0);
         let actualOutput = ShortcodeParser.parseShortcode(testInput, { selfClosingTags: ["img"] }) || null;
 
         expect(actualOutput).to.deep.equal(expectedOutput);
