@@ -110,6 +110,14 @@ describe('ShortcodeParser.parseShortcode() with defaults (fast mode)', function 
         }).to.throw("opening tag");
     });
 
+    it('throws an error for malformatted input: just a closing tag', function () {
+        let testInput = `[/closer]`;
+
+        expect(function () {
+            ShortcodeParser.parseShortcode(testInput, options)
+        }).to.throw("opening tag");
+    });
+
     it('does not error / performs best guess for malformatted input: invalid/missing closing tag', function () {
         let testInput = `we [open] but no [/close]`;
 

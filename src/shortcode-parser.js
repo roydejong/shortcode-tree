@@ -13,7 +13,7 @@ let ShortcodeParser = {
         // Step 1: Apply offset from options, then increase offset as needed by looking for an opening tag
         input = input.substr(options.offset);
 
-        let openingBlockMatch = /\[(.*?)\]/g.exec(input);
+        let openingBlockMatch = /\[[^\/](.*?)\]/g.exec(input);
 
         if (!openingBlockMatch) {
             if (options.throwErrors) {
