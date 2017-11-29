@@ -150,7 +150,8 @@ The following options are available:
 | `offset` | integer | `0` | Offset from the start of the input string, where parsing should begin. |
 | `throwErrors` | boolean | `true` | If enabled: On shortcode parse error, an `Error` is thrown. If disabled: `false` is returned on parse error. |
 | `precise` | boolean | `false` | If things aren't working as expected, enable this for deep recursive parsing. Reduces performance exponentially. |
-| `selfClosingTags` | array | `[]` | You can specify a list of tags that should always be treated as self-closing. Needed when they don't use the "[selfcloser/]" syntax. |    
+| `selfClosingTags` | array | `[]` | You can specify a list of tags that should always be treated as self-closing. Needed when they don't use the "[selfcloser/]" syntax. |
+| `predictSelfClosing` | bool | `true` | If enabled, self-closing tags will be predicted by checking if any closing tags can be found anywhere in the input buffer. Improves stability in most situations, but breaks if your tags are "sometimes" self closing. |    
 
 The default options are defined in `ShortcodeParser.DEFAULT_OPTIONS`.
 

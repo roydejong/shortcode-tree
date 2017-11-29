@@ -118,6 +118,16 @@ describe('ShortcodeTree.parse()', function () {
         let columnNode = parsed.children[0];
         expect(columnNode.children.length).to.equal(1);
     });
+
+    it('parses nested, self-closing tags with inconsistent syntax, and without options entry, correctly (prediction)', function () {
+        let testInput = `[vc_row_inner][mk_image_slideshow][/vc_row_inner]`;
+
+        let parsed = ShortcodeTree.parse(testInput);
+        expect(parsed.children.length).to.equal(1);
+
+        let columnNode = parsed.children[0];
+        expect(columnNode.children.length).to.equal(1);
+    });
 });
 
 

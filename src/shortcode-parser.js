@@ -53,12 +53,8 @@ let ShortcodeParser = {
         //  Otherwise, if we are in precise mode, keep parsing everything past our tag until we find *our* closing tag.
         let closingTagExpected = `[/${shortcode.name}]`;
 
-        let predictedAsSelfClosing = input.indexOf(closingTagExpected) === -1;
-
-        if (predictedAsSelfClosing) {
-            shortcode.isSelfClosing = true;
-        } else {
-            shortcode.isSelfClosing = false;
+        if (options.predictSelfClosing) {
+            shortcode.isSelfClosing = input.indexOf(closingTagExpected) === -1;
         }
 
         if (shortcode.isSelfClosing && input.substr(openBlockTextFull.length, closingTagExpected.length) === closingTagExpected) {
@@ -121,7 +117,11 @@ let ShortcodeParser = {
 
                     if (this.tokenizeOpenBlock(nextBlockInfo, nextBlockTextInner, subParseOptions) !== false) {
                         let blockName = nextBlockInfo.name;
-                        // console.log(nextBlockInfo);
+
+                        if (options.predictSelfClosing) {
+                            let nextClosingTagExpected = `[/${blockName}]`;
+                            nextBlockInfo.isSelfClosing = bufferRemainder.indexOf(nextClosingTagExpected) === -1;
+                        }
 
                         if (!nextBlockInfo.isSelfClosing) {
                             stackLevel++;
@@ -301,10 +301,12 @@ let ShortcodeParser = {
 
         shortcode.properties = properties;
 
-        if (!shortcode.isSelfClosing && options.selfClosingTags.indexOf(shortcode.name) > -1) {
-            // Explicitly listed in options as a naughty, misbehaving self-closing tag
-            // This is one unfortunate scenario where we simply cannot parse blindly :-(
-            shortcode.isSelfClosing = true;
+        if (!options.predictSelfClosing) {
+            if (!shortcode.isSelfClosing && options.selfClosingTags.indexOf(shortcode.name) > -1) {
+                // Explicitly listed in options as a naughty, misbehaving self-closing tag
+                // This is one unfortunate scenario where we simply cannot parse blindly :-(
+                shortcode.isSelfClosing = true;
+            }
         }
     }
 };
@@ -359,7 +361,15 @@ ShortcodeParser.DEFAULT_OPTIONS = {
      *
      * @type array
      */
-    selfClosingTags: []
+    selfClosingTags: [],
+
+    /**
+     * If enabled, self-closing tags will be predicted by checking if any closing tags can be found.
+     * This generally improves stability, but will break horribly if your tags are only "sometimes" self-closing.
+     *
+     * @type boolean
+     */
+    predictSelfClosing: true
 };
 
 module.exports = ShortcodeParser;
