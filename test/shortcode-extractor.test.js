@@ -105,4 +105,14 @@ describe('ShortcodeExtractor.extractShortcodes()', function () {
 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
+
+    it('extracts tags correctly when newlines are at play', function () {
+        let testInput = "[row]\n[col]text[/col]\n[/row]";
+        let actualOutput = ShortcodeExtractor.extractShortcodes(testInput) || null;
+        let expectedOutput = [
+            new Shortcode("row", "\n[col]text[/col]\n", {}, false, "[row]\n[col]text[/col]\n[/row]", 0)
+        ];
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
 });
