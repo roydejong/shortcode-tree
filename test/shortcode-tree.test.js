@@ -128,6 +128,13 @@ describe('ShortcodeTree.parse()', function () {
         let columnNode = parsed.children[0];
         expect(columnNode.children.length).to.equal(1);
     });
+
+    it('generates html equiv text', function () {
+        let testInput = `text [div][strong]Hi[/strong][img/]text[div][strong]sub[/strong][/div][/div] text`;
+
+        let html = ShortcodeTree.generateHtmlEquivalent(testInput);
+        expect(html).to.equal("text <div><strong>Hi</strong><img/>text<div><strong>sub</strong></div></div> text");
+    });
 });
 
 

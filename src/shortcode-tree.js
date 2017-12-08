@@ -97,6 +97,41 @@ let ShortcodeTree = {
 
         fnTraverseNodeForContent(treeRootNode);
         return textContent;
+    },
+
+    generateHtmlEquivalent(input) {
+        let treeRootNode = this.parse(input);
+        let textContent = "";
+
+        let fnTraverseNodeForContent = function (node) {
+            let nodeChildText = null;
+
+            if (node instanceof TextNode) {
+                nodeChildText = node.text;
+            } else if (node instanceof ShortcodeNode) {
+                if (node.children.length) {
+                    let _tvChildContent = '';
+
+                    node.children.forEach(node => {
+                        _tvChildContent += fnTraverseNodeForContent(node);
+                    });
+
+                    if (node.shortcode) {
+                        node.shortcode.content = _tvChildContent;
+                        nodeChildText = node.shortcode.stringifyAsHtml();
+                    } else {
+                        nodeChildText = _tvChildContent;
+                    }
+                } else {
+                    // Topmost node with no children
+                    nodeChildText = node.shortcode.stringifyAsHtml();
+                }
+            }
+
+            return nodeChildText;
+        };
+
+        return fnTraverseNodeForContent(treeRootNode);
     }
 };
 
