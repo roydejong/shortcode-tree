@@ -1,6 +1,6 @@
 {
   "name": "shortcode-tree",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Parser library for reading short codes (BB codes) into a tree structure",
   "main": "dist/index.js",
   "scripts": {

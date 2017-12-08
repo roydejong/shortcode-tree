@@ -225,8 +225,17 @@ let ShortcodeParser = {
 
                             buffer = "";
 
-                            readingPropName = false;
-                            readingPropVal = true;
+                            if (nextToken === ShortcodeParser.T_TAG_PROPERTY_SEPARATOR) {
+                                // Value-less property
+                                readingPropName = true;
+                                readingPropVal = false;
+
+                                currentPropKey = null;
+                            } else {
+                                readingPropName = false;
+                                readingPropVal = true;
+                            }
+
                             readingPropValLiteral = false;
                         }
 

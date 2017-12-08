@@ -78,6 +78,22 @@ describe('ShortcodeParser.parseShortcode() with defaults (fast mode)', function 
         expect(actualOutput).to.deep.equal(expectedOutput);
     });
 
+    it('parses a self-closing shortcode with ending integer property', function () {
+        let testInput = `[image id=123/]`;
+        let expectedOutput = new Shortcode("image", null, {"id": "123"}, true, testInput);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, options) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+
+    it('parses a self-closing shortcode with value-less property', function () {
+        let testInput = `[image zz id=123/]`;
+        let expectedOutput = new Shortcode("image", null, {"zz": null, "id": "123"}, true, testInput);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, options) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+
     it('parses only the first shortcode from a set of sticky shortcodes', function () {
         let testInput = `[b]test[/b] not [i]italics[/i]`;
         let expectedOutput = new Shortcode("b", "test", {}, false, "[b]test[/b]");
@@ -122,6 +138,14 @@ describe('ShortcodeParser.parseShortcode() with defaults (fast mode)', function 
         let testInput = `we [open] but no [/close]`;
 
         let expectedOutput = new Shortcode("open", null, {}, true, "[open]", 3);
+        let actualOutput = ShortcodeParser.parseShortcode(testInput, options) || null;
+
+        expect(actualOutput).to.deep.equal(expectedOutput);
+    });
+
+    it('parses a broken self-closing shortcode with ending integer property', function () {
+        let testInput = `[image id=123]`;
+        let expectedOutput = new Shortcode("image", null, {"id": "123"}, true, testInput);
         let actualOutput = ShortcodeParser.parseShortcode(testInput, options) || null;
 
         expect(actualOutput).to.deep.equal(expectedOutput);
