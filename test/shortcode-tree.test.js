@@ -135,6 +135,19 @@ describe('ShortcodeTree.parse()', function () {
         let html = ShortcodeTree.generateHtmlEquivalent(testInput);
         expect(html).to.equal("text <div><strong>Hi</strong><img/>text<div><strong>sub</strong></div></div> text");
     });
+
+    it('generates html equiv text with config tag name map', function () {
+        let testInput = `[blah][image/][/blah]`;
+
+        let html = ShortcodeTree.generateHtmlEquivalent(testInput, {
+            tagNameMap: {
+                "blah": "div",
+                "image": "img"
+            }
+        });
+
+        expect(html).to.equal("<div><img/></div>");
+    });
 });
 
 

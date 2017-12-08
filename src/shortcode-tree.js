@@ -99,7 +99,7 @@ let ShortcodeTree = {
         return textContent;
     },
 
-    generateHtmlEquivalent(input) {
+    generateHtmlEquivalent(input, options) {
         let treeRootNode = this.parse(input);
         let textContent = "";
 
@@ -118,13 +118,13 @@ let ShortcodeTree = {
 
                     if (node.shortcode) {
                         node.shortcode.content = _tvChildContent;
-                        nodeChildText = node.shortcode.stringifyAsHtml();
+                        nodeChildText = node.shortcode.stringifyAsHtml(null, options);
                     } else {
                         nodeChildText = _tvChildContent;
                     }
                 } else {
                     // Topmost node with no children
-                    nodeChildText = node.shortcode.stringifyAsHtml();
+                    nodeChildText = node.shortcode.stringifyAsHtml(null, options);
                 }
             }
 

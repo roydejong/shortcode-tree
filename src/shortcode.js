@@ -123,15 +123,20 @@ class Shortcode {
      * Renders this Shortcode as formatted code, in HTML style.
      *
      * @param {string|null} tagName Optional HTML tag name override.
+     * @param {object} options Formatter options
      * @return {*}
      */
-    stringifyAsHtml(tagName) {
-        let config = {
+    stringifyAsHtml(tagName, options) {
+        let optionsMerged = {
             asHtml: true,
             tagName: tagName ? tagName : null
         };
 
-        return ShortcodeFormatter.stringify(this, config);
+        if (options) {
+            optionsMerged = Object.assign({}, options, optionsMerged);
+        }
+
+        return ShortcodeFormatter.stringify(this, optionsMerged);
     }
 
     /**

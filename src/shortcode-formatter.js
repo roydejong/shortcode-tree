@@ -17,10 +17,17 @@ let ShortcodeFormatter = {
         }
 
         let buffer = "";
+        let tagNameToUse = shortcode.name;
+
+        if (options.tagName) {
+            tagNameToUse = options.tagName;
+        } else if (typeof options.tagNameMap[tagNameToUse] !== "undefined") {
+            tagNameToUse = options.tagNameMap[tagNameToUse];
+        }
 
         // Open tag "[name"
         buffer += options.asHtml ? ShortcodeFormatter.T_TAG_START_HTML : ShortcodeFormatter.T_TAG_START;
-        buffer += options.tagName ? options.tagName : shortcode.name;
+        buffer += tagNameToUse;
 
         // Add any properties
         for (let key in shortcode.properties) {
@@ -73,12 +80,12 @@ let ShortcodeFormatter = {
             if (options.asHtml) {
                 buffer += ShortcodeFormatter.T_TAG_START_HTML;
                 buffer += ShortcodeFormatter.T_TAG_CLOSER;
-                buffer += shortcode.name;
+                buffer += tagNameToUse;
                 buffer += ShortcodeFormatter.T_TAG_END_HTML;
             } else {
                 buffer += ShortcodeFormatter.T_TAG_START;
                 buffer += ShortcodeFormatter.T_TAG_CLOSER;
-                buffer += shortcode.name;
+                buffer += tagNameToUse;
                 buffer += ShortcodeFormatter.T_TAG_END;
             }
         }
@@ -121,7 +128,8 @@ ShortcodeFormatter.T_TAG_PROPERTY_VALUE_ESCAPE = '\\';
 
 ShortcodeFormatter.DEFAULT_OPTIONS = {
     asHtml: false,
-    tagName: null
+    tagName: null,
+    tagNameMap: {}
 };
 
 module.exports = ShortcodeFormatter;
