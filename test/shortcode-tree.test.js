@@ -148,6 +148,13 @@ describe('ShortcodeTree.parse()', function () {
 
         expect(html).to.equal("<div><img/></div>");
     });
+
+    it('does not crash and burn on html equiv text generation with blank input', function () {
+        let testInput = ``;
+
+        let html = ShortcodeTree.generateHtmlEquivalent(testInput);
+        expect(html).to.equal("");
+    });
 });
 
 

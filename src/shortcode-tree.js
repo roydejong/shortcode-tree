@@ -124,7 +124,11 @@ let ShortcodeTree = {
                     }
                 } else {
                     // Topmost node with no children
-                    nodeChildText = node.shortcode.stringifyAsHtml(null, options);
+                    if (node.shortcode) {
+                        nodeChildText = node.shortcode.stringifyAsHtml(null, options);
+                    } else {
+                        nodeChildText = node.text || "";
+                    }
                 }
             }
 
