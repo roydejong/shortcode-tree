@@ -111,12 +111,27 @@ class Shortcode {
     }
 
     /**
-     * Renders this Shortcode as formatted code.
+     * Renders this Shortcode as formatted code, in shortcode style.
      *
      * @returns {string}
      */
     stringify() {
         return ShortcodeFormatter.stringify(this);
+    }
+
+    /**
+     * Renders this Shortcode as formatted code, in HTML style.
+     *
+     * @param {string|null} tagName Optional HTML tag name override.
+     * @return {*}
+     */
+    stringifyAsHtml(tagName) {
+        let config = {
+            asHtml: true,
+            tagName: tagName ? tagName : null
+        };
+
+        return ShortcodeFormatter.stringify(this, config);
     }
 
     /**

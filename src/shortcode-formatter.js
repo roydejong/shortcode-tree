@@ -9,12 +9,18 @@ let ShortcodeFormatter = {
      *
      * @param {Shortcode} shortcode
      */
-    stringify(shortcode) {
+    stringify(shortcode, options) {
+        if (!options) {
+            options = ShortcodeFormatter.DEFAULT_OPTIONS;
+        } else {
+            options = Object.assign({}, ShortcodeFormatter.DEFAULT_OPTIONS, options);
+        }
+
         let buffer = "";
 
         // Open tag "[name"
-        buffer += ShortcodeFormatter.T_TAG_START;
-        buffer += shortcode.name;
+        buffer += options.asHtml ? ShortcodeFormatter.T_TAG_START_HTML : ShortcodeFormatter.T_TAG_START;
+        buffer += options.tagName ? options.tagName : shortcode.name;
 
         // Add any properties
         for (let key in shortcode.properties) {
@@ -34,7 +40,7 @@ let ShortcodeFormatter = {
                 buffer += ShortcodeFormatter.T_TAG_PROPERTY_ASSIGN;
 
                 // Wrap in quotes as string literal if needed
-                if (this.getShouldValueBeLiteral(value)) {
+                if (options.asHtml || this.getShouldValueBeLiteral(value)) {
                     buffer += ShortcodeFormatter.T_TAG_PROPERTY_VALUE_WRAPPER;
                     buffer += this.escapeValueForLiteral(value);
                     buffer += ShortcodeFormatter.T_TAG_PROPERTY_VALUE_WRAPPER;
@@ -51,7 +57,11 @@ let ShortcodeFormatter = {
             buffer += ShortcodeFormatter.T_TAG_CLOSER;
         }
 
-        buffer += ShortcodeFormatter.T_TAG_END;
+        if (options.asHtml) {
+            buffer += ShortcodeFormatter.T_TAG_END_HTML;
+        } else {
+            buffer += ShortcodeFormatter.T_TAG_END;
+        }
 
         // Add raw content
         if (shortcode.content) {
@@ -60,10 +70,17 @@ let ShortcodeFormatter = {
 
         // Add close tag
         if (!shortcode.isSelfClosing) {
-            buffer += ShortcodeFormatter.T_TAG_START;
-            buffer += ShortcodeFormatter.T_TAG_CLOSER;
-            buffer += shortcode.name;
-            buffer += ShortcodeFormatter.T_TAG_END;
+            if (options.asHtml) {
+                buffer += ShortcodeFormatter.T_TAG_START_HTML;
+                buffer += ShortcodeFormatter.T_TAG_CLOSER;
+                buffer += shortcode.name;
+                buffer += ShortcodeFormatter.T_TAG_END_HTML;
+            } else {
+                buffer += ShortcodeFormatter.T_TAG_START;
+                buffer += ShortcodeFormatter.T_TAG_CLOSER;
+                buffer += shortcode.name;
+                buffer += ShortcodeFormatter.T_TAG_END;
+            }
         }
 
         return buffer;
@@ -94,10 +111,17 @@ let ShortcodeFormatter = {
 
 ShortcodeFormatter.T_TAG_START = "[";
 ShortcodeFormatter.T_TAG_END = "]";
+ShortcodeFormatter.T_TAG_START_HTML = "<";
+ShortcodeFormatter.T_TAG_END_HTML = ">";
 ShortcodeFormatter.T_TAG_CLOSER = "/";
 ShortcodeFormatter.T_TAG_PROPERTY_ASSIGN = "=";
 ShortcodeFormatter.T_TAG_PROPERTY_VALUE_WRAPPER = '"';
 ShortcodeFormatter.T_TAG_PROPERTY_SEPARATOR = ' ';
 ShortcodeFormatter.T_TAG_PROPERTY_VALUE_ESCAPE = '\\';
+
+ShortcodeFormatter.DEFAULT_OPTIONS = {
+    asHtml: false,
+    tagName: null
+};
 
 module.exports = ShortcodeFormatter;

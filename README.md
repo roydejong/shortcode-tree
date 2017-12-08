@@ -29,7 +29,7 @@ Example:
 - Parse individual shortcode fragments
 - Supports self-closing tags
 - Supports tag properties (with or without string literals)
-- Stringify `Shortcode` objects to shortcode text
+- Stringify `Shortcode` objects to shortcode text or HTML equivalent
 - Extract only text / HTML from a document containg shortcodes
 
 ## Installation
@@ -81,6 +81,7 @@ A parsed shortcode. Typically available through the `shortcode` field of a short
 | Signature | Returns | Description |
 | --- | --- | --- |
 | `stringify()` | string | Formats the data in the `Shortcode` object to shortcode text |
+| `stringifyHtml([string/null] tagName)` | string | Formats the data in the `Shortcode` object to HTML text |
 | `hasProperty([string] key)` | boolean | Gets whether property with name `key` exists. |
 | `getProperty([string] key)` | value or null | Gets value of property with name `key`, or NULL if not set. |
 | `setProperty([string] key, value)` | void | Add or update property with given key and value. |
