@@ -113,10 +113,11 @@ class Shortcode {
     /**
      * Renders this Shortcode as formatted code, in shortcode style.
      *
+     * @param {object} options Formatter options
      * @returns {string}
      */
-    stringify() {
-        return ShortcodeFormatter.stringify(this);
+    stringify(options) {
+        return ShortcodeFormatter.stringify(this, options);
     }
 
     /**
