@@ -28,6 +28,14 @@ describe('ShortcodeFormatter.stringify()', function () {
         expect(actualOutput).to.equal(expectedOutput);
     });
 
+    it('stringifies a simple shortcode, but leaves out value-less properties with `blankProperties` config set to false', function () {
+        let testInput = new Shortcode("b", "Bold text", {"checked": null});
+        let expectedOutput = "[b]Bold text[/b]";
+        let actualOutput = ShortcodeFormatter.stringify(testInput, { blankProperties: false });
+
+        expect(actualOutput).to.equal(expectedOutput);
+    });
+
     it('stringifies a self-closing shortcode', function () {
         let testInput = new Shortcode("img", null, {}, true);
         let expectedOutput = "[img/]";

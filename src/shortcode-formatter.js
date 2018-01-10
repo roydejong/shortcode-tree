@@ -37,12 +37,17 @@ let ShortcodeFormatter = {
 
             let valueRaw = (shortcode.properties[key]);
             let value = valueRaw ? valueRaw.toString().trim() : null;
+            let hasValue = value && value.length;
+
+            if (!hasValue && !options.blankProperties) {
+                continue;
+            }
 
             // Add property key
             buffer += ShortcodeFormatter.T_TAG_PROPERTY_SEPARATOR;
             buffer += key;
 
-            if (value && value.length) {
+            if (hasValue) {
                 // Value is non empty
                 buffer += ShortcodeFormatter.T_TAG_PROPERTY_ASSIGN;
 
@@ -129,7 +134,8 @@ ShortcodeFormatter.T_TAG_PROPERTY_VALUE_ESCAPE = '\\';
 ShortcodeFormatter.DEFAULT_OPTIONS = {
     asHtml: false,
     tagName: null,
-    tagNameMap: {}
+    tagNameMap: {},
+    blankProperties: true
 };
 
 module.exports = ShortcodeFormatter;
