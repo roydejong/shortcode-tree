@@ -60,6 +60,14 @@ describe('ShortcodeFormatter.stringify()', function () {
         expect(actualOutput).to.equal(expectedOutput);
     });
 
+    it('correctly escapes square brackets in string literals in shortcode properties', function () {
+        let testInput = new Shortcode("b", "Bold text", {"name": `[b]embedded[/b]`});
+        let expectedOutput = `[b name="&#91;b&#93;embedded&#91;/b&#93;"]Bold text[/b]`;
+        let actualOutput = ShortcodeFormatter.stringify(testInput);
+
+        expect(actualOutput).to.equal(expectedOutput);
+    });
+
     it('does not format single number values as string literals in shortcode properties', function () {
         let testInput = new Shortcode("b", "Bold text", {"one": `100%`, "two": 123, "three": 123.45, "four": "12345"});
         let expectedOutput = `[b one="100%" two=123 three="123.45" four=12345]Bold text[/b]`;

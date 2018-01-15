@@ -117,6 +117,9 @@ let ShortcodeFormatter = {
         strValue = fnReplaceAll(strValue, ShortcodeFormatter.T_TAG_PROPERTY_VALUE_WRAPPER,
             ShortcodeFormatter.T_TAG_PROPERTY_VALUE_ESCAPE + ShortcodeFormatter.T_TAG_PROPERTY_VALUE_WRAPPER);
 
+        strValue = fnReplaceAll(strValue, "\\" + ShortcodeFormatter.T_TAG_START, "&#91;"); // convert [ to html entity
+        strValue = fnReplaceAll(strValue, "\\" + ShortcodeFormatter.T_TAG_END, "&#93;"); // convert ] to html entity
+
         return strValue;
     }
 };
